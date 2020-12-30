@@ -45,22 +45,31 @@
         display: none;
       }
 
-      .new-game-container {
+      .finish-game-menu {
+        display: none;
+        color: white;
+        white-space: pre;
+      }
+
+      .finish-game-code {
+        padding-bottom: 20px;
+        display: block;
       }
     </style>
   </head>
   <body>
     <div class="main-container">
-      <div>
-        <button>New game</button>
-      </div>
-
       <div class="game-container">
         <div class="canvas-wrapper">
           <canvas class="canvas"></canvas>
         </div>
 
         <div class="new-game-menu">
+          <button onclick="main('numbersAsc');">New game</button>
+        </div>
+        <div class="finish-game-menu">
+          Congrats
+          <code class="finish-game-code"></code>
           <button onclick="main('numbersAsc');">New game</button>
         </div>
       </div>

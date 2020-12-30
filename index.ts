@@ -78,13 +78,16 @@ class Stats {
   }
 
   print() {
-    console.log(`
-            Total duraction: ${(this!.end - this.start) / 1000} sec
-            Misclicks: ${this.clicks - this.correctClicks}
-        `)
+    let res = ''
+
+    res += `
+Total duraction: ${(this!.end - this.start) / 1000} sec
+Misclicks: ${this.clicks - this.correctClicks}
+
+`
 
     for (const int of this.intervals) {
-      console.log(`${int.number}: ${int.duration / 1000} sec`)
+      res += `${int.number}: ${int.duration / 1000} sec\n`
     }
 
     const opts = {
@@ -99,6 +102,7 @@ class Stats {
     //     opts,
     //   ),
     // )
+    return res
   }
 }
 
@@ -224,6 +228,8 @@ class Board {
     canvasWrapper: HTMLElement
     canvas: HTMLCanvasElement
     newGameMenu: HTMLElement
+    finishGameMenu: HTMLElement
+    finishGameCode: HTMLElement
   }
   ctx: CanvasRenderingContext2D
   circles: Circle[]
@@ -241,6 +247,8 @@ class Board {
       canvasWrapper: getElement('canvas-wrapper'),
       canvas: getElement('canvas') as HTMLCanvasElement,
       newGameMenu: getElement('new-game-menu'),
+      finishGameMenu: getElement('finish-game-menu'),
+      finishGameCode: getElement('finish-game-code'),
     }
 
     this.sizeX = 0
@@ -267,9 +275,9 @@ class Board {
         this.stats.finish()
         this.toggleVisibility(
           this.elements.canvasWrapper,
-          this.elements.newGameMenu,
+          this.elements.finishGameMenu,
         )
-        this.stats.print()
+        this.elements.finishGameCode.innerHTML = this.stats.print()
       }
       this.draw()
     }
