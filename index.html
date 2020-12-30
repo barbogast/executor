@@ -8,24 +8,54 @@
     />
     <title>Canvas tutorial</title>
     <script src="https://unpkg.com/asciichart@1.5.25/asciichart.js"></script>
-    <script type="text/javascript" src="./index.js"></script>
 
     <style type="text/css">
       canvas {
-        border: 1px solid black;
-        margin: 20px;
         outline: none;
         -webkit-tap-highlight-color: transparent;
+        display: block;
       }
       .pointer {
         cursor: pointer;
       }
+
+      html,
       body {
+        left: 0;
+        right: 0;
+        height: 100%;
+      }
+
+      .main-container {
         background-color: lightgray;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .game-container {
+        padding: 20px;
+        background-color: black;
+        flex: 1;
+        display: flex;
+      }
+
+      .canvas-wrapper {
+        flex: 1;
       }
     </style>
   </head>
   <body onload="main('numbersAsc');">
-    <canvas id="tutorial"></canvas>
+    <div class="main-container">
+      <div>
+        <button>New game</button>
+      </div>
+      <div class="game-container">
+        <div class="canvas-wrapper">
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="./index.js"></script>
   </body>
 </html>

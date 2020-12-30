@@ -1,7 +1,11 @@
 const AMOUNT = 10
 
-const SIZE_X = window.innerWidth - 50
-const SIZE_Y = window.innerHeight - 50
+const canvasWrapper = document.getElementsByClassName('canvas-wrapper')[0]
+if (!canvasWrapper) {
+  throw new Error('canvasContainer not found')
+}
+const SIZE_X = canvasWrapper.clientWidth
+const SIZE_Y = canvasWrapper.clientHeight
 
 const FONTSIZE = 26
 const RADIUS = 25
@@ -209,7 +213,7 @@ function main(
     | 'lettersAsc'
     | 'lettersDesc',
 ) {
-  const canvas = document.getElementById('tutorial') as HTMLCanvasElement | void
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
   if (!canvas) {
     throw new Error('canvas not found')
   }
