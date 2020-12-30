@@ -23,11 +23,11 @@ const COLORS = [
   '#F07270',
 ]
 
-function clear(ctx) {
+function clear(ctx: CanvasRenderingContext2D) {
   ctx.clearRect(0, 0, SIZE_X, SIZE_Y)
 }
 
-function getRandomArbitrary(min, max) {
+function getRandomArbitrary(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min)
 }
 
@@ -35,18 +35,26 @@ function getCurrentTimestamp() {
   return new Date().getTime()
 }
 
-function getAlphabet(limit) {
+function getAlphabet(limit: number) {
   let a = ''
-  for (i = 9; ++i < 36; ) {
+  for (let i = 9; ++i < 36; ) {
     a += i.toString(36)
   }
   return a.slice(0, limit).toUpperCase().split('')
 }
 
 class Stats {
+  start: number
+  end: number
+  startCurrent: number
+  clicks: number
+  correctClicks: number
+  intervals: {number: string, duration: number}[]
+
   constructor() {
     const now = getCurrentTimestamp()
     this.start = now
+    this.end = now
     this.startCurrent = now
     this.clicks = 0
     this.correctClicks = 0
@@ -57,7 +65,7 @@ class Stats {
     this.clicks += 1
   }
 
-  foundNumber(number) {
+  foundNumber(number: string) {
     this.correctClicks += 1
     const now = getCurrentTimestamp()
     this.intervals.push({ number, duration: now - this.startCurrent })
@@ -65,12 +73,12 @@ class Stats {
   }
 
   finish() {
-    this.totalTime = getCurrentTimestamp() - this.start
+    this.end = getCurrentTimestamp()
   }
 
   print() {
     console.log(`
-            Total duraction: ${this.totalTime / 1000} sec
+            Total duraction: ${(this!.end - this.start) / 1000} sec
             Misclicks: ${this.clicks - this.correctClicks}
         `)
 
@@ -80,21 +88,26 @@ class Stats {
 
     const opts = {
       height: 6,
-      format: function (x, i) {
+      format: function (x: number, i: number) {
         return (x / 1000).toFixed(2)
       },
     }
-    console.log(
-      asciichart.plot(
-        this.intervals.map((x) => x.duration),
-        opts,
-      ),
-    )
+    // console.log(
+    //   asciichart.plot(
+    //     this.intervals.map((x) => x.duration),
+    //     opts,
+    //   ),
+    // )
   }
 }
 
 class Circle {
-  constructor(centerX, centerY, text, color) {
+  _object: Path2D | void
+  centerX: any
+  centerY: any
+  text: any
+  color: any
+  constructor(centerX: number, centerY: number, text: string, color: string) {
     this._object = undefined
     this.centerX = centerX
     this.centerY = centerY
@@ -102,7 +115,7 @@ class Circle {
     this.color = color
   }
 
-  draw(ctx, hideNumbers) {
+  draw(ctx: CanvasRenderingContext2D, hideNumbers: boolean) {
     this._object = new Path2D()
     ctx.beginPath()
     this._object.arc(this.centerX, this.centerY, RADIUS, 0, 2 * Math.PI, false)
@@ -122,12 +135,15 @@ class Circle {
     }
   }
 
-  isInPath(ctx, x, y) {
+  isInPath(ctx: CanvasRenderingContext2D, x: number, y: number) {
+    if(!this._object){
+      throw new Error('path is undefined')
+    }
     return ctx.isPointInPath(this._object, x, y)
   }
 }
 
-function doesCollide(circles, centerX, centerY) {
+function doesCollide(circles: Circle[], centerX: number, centerY: number) {
   for (const circle of circles) {
     if (
       !(
@@ -145,7 +161,7 @@ function doesCollide(circles, centerX, centerY) {
   return false
 }
 
-function findFreeSpot(circles) {
+function findFreeSpot(circles: Circle[]) {
   const dist = RADIUS + RADIUS * 0.1
 
   let counter = 0
@@ -174,16 +190,22 @@ function findFreeSpot(circles) {
   }
 }
 
-function draw(ctx, objects, hideNumbers) {
+function draw(ctx: CanvasRenderingContext2D, objects: Circle[], hideNumbers: boolean) {
   clear(ctx)
   for (const obj of objects) {
     obj.draw(ctx, hideNumbers)
   }
 }
 
-function main(gameType) {
-  const canvas = document.getElementById('tutorial')
+function main(gameType: 'numbersAsc' | 'numbersDesc' | 'mixAsc' | 'lettersAsc' | 'lettersDesc') {
+  const canvas = document.getElementById('tutorial') as HTMLCanvasElement | void
+  if(!canvas){
+    throw new Error('canvas not found')
+  }
   const ctx = canvas.getContext('2d')
+  if(!ctx){
+    throw new Error('ctx is undefined')
+  }
 
   COLORS.sort(() => 0.5 - Math.random())
 
@@ -192,18 +214,18 @@ function main(gameType) {
 
   let hideNumbers = false
 
-  let def = []
+  let def: string[] = []
   switch (gameType) {
     case 'numbersAsc': {
       for (let i = 0; i < AMOUNT; i++) {
-        def.push(i + 1)
+        def.push(String(i + 1))
       }
       break
     }
 
     case 'numbersDesc': {
       for (let i = AMOUNT; i > 0; i--) {
-        def.push(i)
+        def.push(String(i))
       }
       break
     }
@@ -211,7 +233,7 @@ function main(gameType) {
     case 'mixAsc': {
       const alpha = getAlphabet(AMOUNT)
       for (let i = 0; i < AMOUNT; i++) {
-        def.push(i + 1)
+        def.push(String(i + 1))
         def.push(alpha[i])
       }
       def = def.slice(0, AMOUNT)
@@ -230,7 +252,7 @@ function main(gameType) {
     }
   }
 
-  let circles = []
+  let circles: Circle[] = []
 
   for (let i = 0; i < def.length; i++) {
     const [centerX, centerY] = findFreeSpot(circles)
@@ -252,13 +274,11 @@ function main(gameType) {
       circle.isInPath(ctx, e.offsetX, e.offsetY),
     )
     if (!clickedCircle) {
-      stats.misclicks += 1
       return
     }
 
     if (circles.indexOf(clickedCircle) === 0) {
       stats.foundNumber(clickedCircle.text)
-      current = clickedCircle.text
       circles = circles.filter((c) => c.text !== clickedCircle.text)
       if (!circles.length) {
         stats.finish()
