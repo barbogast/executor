@@ -1,10 +1,10 @@
 const AMOUNT = 10
 
-const SIZE_X = 500
-const SIZE_Y = 500
+const SIZE_X = window.innerWidth - 50
+const SIZE_Y = window.innerHeight - 50
 
 const FONTSIZE = 26
-const RADIUS = 20
+const RADIUS = 25
 const DIST = RADIUS + RADIUS * 0.1
 
 const HIDE_AFTER = 5
@@ -213,6 +213,9 @@ function main(
   if (!canvas) {
     throw new Error('canvas not found')
   }
+  canvas.width = SIZE_X
+  canvas.height = SIZE_Y
+
   const ctx = canvas.getContext('2d')
   if (!ctx) {
     throw new Error('ctx is undefined')
