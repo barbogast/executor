@@ -42,17 +42,26 @@
 
       .canvas-wrapper {
         flex: 1;
+        display: none;
+      }
+
+      .new-game-container {
       }
     </style>
   </head>
-  <body onload="main('numbersAsc');">
+  <body>
     <div class="main-container">
       <div>
         <button>New game</button>
       </div>
+
       <div class="game-container">
         <div class="canvas-wrapper">
           <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="new-game-menu">
+          <button onclick="main('numbersAsc');">New game</button>
         </div>
       </div>
     </div>

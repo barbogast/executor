@@ -212,6 +212,7 @@ function doesCollide(circles: Circle[], centerX: number, centerY: number) {
 }
 
 class Board {
+  canvasWrapper: HTMLElement
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   circles: Circle[]
@@ -229,8 +230,10 @@ class Board {
     if (!canvasWrapper) {
       throw new Error('canvasContainer not found')
     }
-    this.sizeX = canvasWrapper.clientWidth
-    this.sizeY = canvasWrapper.clientHeight
+    this.canvasWrapper = canvasWrapper as HTMLElement
+
+    this.sizeX = 0
+    this.sizeY = 0
 
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
     if (!canvas) {
@@ -314,6 +317,19 @@ class Board {
   }
 
   setup(gameType: GameType) {
+    const newGameMenu = document.getElementsByClassName(
+      'new-game-menu',
+    )[0] as HTMLElement
+    if (!newGameMenu) {
+      throw new Error('newGameMenu not found')
+    }
+    newGameMenu.style.display = 'none'
+
+    this.canvasWrapper.style.display = 'block'
+
+    this.sizeX = this.canvasWrapper.clientWidth
+    this.sizeY = this.canvasWrapper.clientHeight
+
     this.canvas.width = this.sizeX
     this.canvas.height = this.sizeY
 
