@@ -1,12 +1,5 @@
 const AMOUNT = 10
 
-const canvasWrapper = document.getElementsByClassName('canvas-wrapper')[0]
-if (!canvasWrapper) {
-  throw new Error('canvasContainer not found')
-}
-const SIZE_X = canvasWrapper.clientWidth
-const SIZE_Y = canvasWrapper.clientHeight
-
 const FONTSIZE = 26
 const RADIUS = 25
 const DIST = RADIUS + RADIUS * 0.1
@@ -218,46 +211,26 @@ function doesCollide(circles: Circle[], centerX: number, centerY: number) {
   return false
 }
 
-function findFreeSpot(circles: Circle[]) {
-  const dist = RADIUS + RADIUS * 0.1
-
-  let counter = 0
-  while (true) {
-    counter += 1
-    if (counter > 1000) {
-      throw new Error('Couldnt find free spot')
-    }
-
-    const centerX = getRandomArbitrary(0, SIZE_X)
-    const centerY = getRandomArbitrary(0, SIZE_Y)
-    if (
-      centerX - dist < 0 ||
-      centerX + DIST > SIZE_X ||
-      centerY - DIST < 0 ||
-      centerY + dist > SIZE_Y
-    ) {
-      continue
-    }
-
-    if (doesCollide(circles, centerX, centerY)) {
-      continue
-    }
-
-    return [centerX, centerY]
-  }
-}
-
 class Board {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   circles: Circle[]
   stats: Stats
   hideNumbers: boolean
+  sizeX: number
+  sizeY: number
 
   constructor() {
     this.circles = []
     this.stats = new Stats()
     this.hideNumbers = false
+
+    const canvasWrapper = document.getElementsByClassName('canvas-wrapper')[0]
+    if (!canvasWrapper) {
+      throw new Error('canvasContainer not found')
+    }
+    this.sizeX = canvasWrapper.clientWidth
+    this.sizeY = canvasWrapper.clientHeight
 
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
     if (!canvas) {
@@ -301,7 +274,7 @@ class Board {
   }
 
   clear() {
-    this.ctx.clearRect(0, 0, SIZE_X, SIZE_Y)
+    this.ctx.clearRect(0, 0, this.sizeX, this.sizeY)
   }
 
   draw() {
@@ -311,15 +284,44 @@ class Board {
     }
   }
 
+  findFreeSpot() {
+    const dist = RADIUS + RADIUS * 0.1
+
+    let counter = 0
+    while (true) {
+      counter += 1
+      if (counter > 1000) {
+        throw new Error('Couldnt find free spot')
+      }
+
+      const centerX = getRandomArbitrary(0, this.sizeX)
+      const centerY = getRandomArbitrary(0, this.sizeY)
+      if (
+        centerX - dist < 0 ||
+        centerX + DIST > this.sizeX ||
+        centerY - DIST < 0 ||
+        centerY + dist > this.sizeY
+      ) {
+        continue
+      }
+
+      if (doesCollide(this.circles, centerX, centerY)) {
+        continue
+      }
+
+      return [centerX, centerY]
+    }
+  }
+
   setup(gameType: GameType) {
-    this.canvas.width = SIZE_X
-    this.canvas.height = SIZE_Y
+    this.canvas.width = this.sizeX
+    this.canvas.height = this.sizeY
 
     COLORS.sort(() => 0.5 - Math.random())
 
     const definitions = getCircleDefinitions(gameType)
     for (let i = 0; i < definitions.length; i++) {
-      const [centerX, centerY] = findFreeSpot(this.circles)
+      const [centerX, centerY] = this.findFreeSpot()
       this.circles.push(
         new Circle(this.ctx, centerX, centerY, definitions[i], COLORS[i % 10]),
       )
