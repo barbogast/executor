@@ -27,10 +27,6 @@ const COLORS = [
   '#F07270',
 ]
 
-function clear(ctx: CanvasRenderingContext2D) {
-  ctx.clearRect(0, 0, SIZE_X, SIZE_Y)
-}
-
 function getRandomArbitrary(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min)
 }
@@ -105,13 +101,70 @@ class Stats {
   }
 }
 
+type GameType =
+  | 'numbersAsc'
+  | 'numbersDesc'
+  | 'mixAsc'
+  | 'lettersAsc'
+  | 'lettersDesc'
+
+function getCircleDefinitions(gameType: GameType) {
+  let def: string[] = []
+  switch (gameType) {
+    case 'numbersAsc': {
+      for (let i = 0; i < AMOUNT; i++) {
+        def.push(String(i + 1))
+      }
+      break
+    }
+
+    case 'numbersDesc': {
+      for (let i = AMOUNT; i > 0; i--) {
+        def.push(String(i))
+      }
+      break
+    }
+
+    case 'mixAsc': {
+      const alpha = getAlphabet(AMOUNT)
+      for (let i = 0; i < AMOUNT; i++) {
+        def.push(String(i + 1))
+        def.push(alpha[i])
+      }
+      def = def.slice(0, AMOUNT)
+      break
+    }
+
+    case 'lettersAsc': {
+      def = getAlphabet(AMOUNT)
+      break
+    }
+
+    case 'lettersDesc': {
+      def = getAlphabet(AMOUNT)
+      def.reverse()
+      break
+    }
+  }
+  return def
+}
+
 class Circle {
+  ctx: CanvasRenderingContext2D
   _object: Path2D | void
-  centerX: any
-  centerY: any
-  text: any
-  color: any
-  constructor(centerX: number, centerY: number, text: string, color: string) {
+  centerX: number
+  centerY: number
+  text: string
+  color: string
+
+  constructor(
+    ctx: CanvasRenderingContext2D,
+    centerX: number,
+    centerY: number,
+    text: string,
+    color: string,
+  ) {
+    this.ctx = ctx
     this._object = undefined
     this.centerX = centerX
     this.centerY = centerY
@@ -119,31 +172,31 @@ class Circle {
     this.color = color
   }
 
-  draw(ctx: CanvasRenderingContext2D, hideNumbers: boolean) {
+  draw(hideNumbers: boolean) {
     this._object = new Path2D()
-    ctx.beginPath()
+    this.ctx.beginPath()
     this._object.arc(this.centerX, this.centerY, RADIUS, 0, 2 * Math.PI, false)
-    ctx.fillStyle = this.color
-    ctx.fill(this._object)
-    ctx.lineWidth = 2
-    ctx.strokeStyle = '#003300'
-    ctx.stroke(this._object)
+    this.ctx.fillStyle = this.color
+    this.ctx.fill(this._object)
+    this.ctx.lineWidth = 2
+    this.ctx.strokeStyle = '#003300'
+    this.ctx.stroke(this._object)
 
-    ctx.fillStyle = 'black'
+    this.ctx.fillStyle = 'black'
 
     if (!hideNumbers) {
-      ctx.font = `${FONTSIZE}px sans-serif`
-      ctx.textBaseline = 'middle'
-      ctx.textAlign = 'center'
-      ctx.fillText(this.text, this.centerX, this.centerY)
+      this.ctx.font = `${FONTSIZE}px sans-serif`
+      this.ctx.textBaseline = 'middle'
+      this.ctx.textAlign = 'center'
+      this.ctx.fillText(this.text, this.centerX, this.centerY)
     }
   }
 
-  isInPath(ctx: CanvasRenderingContext2D, x: number, y: number) {
+  isInPath(x: number, y: number) {
     if (!this._object) {
       throw new Error('path is undefined')
     }
-    return ctx.isPointInPath(this._object, x, y)
+    return this.ctx.isPointInPath(this._object, x, y)
   }
 }
 
@@ -194,125 +247,104 @@ function findFreeSpot(circles: Circle[]) {
   }
 }
 
-function draw(
-  ctx: CanvasRenderingContext2D,
-  objects: Circle[],
-  hideNumbers: boolean,
-) {
-  clear(ctx)
-  for (const obj of objects) {
-    obj.draw(ctx, hideNumbers)
-  }
-}
+class Board {
+  canvas: HTMLCanvasElement
+  ctx: CanvasRenderingContext2D
+  circles: Circle[]
+  stats: Stats
+  hideNumbers: boolean
 
-function main(
-  gameType:
-    | 'numbersAsc'
-    | 'numbersDesc'
-    | 'mixAsc'
-    | 'lettersAsc'
-    | 'lettersDesc',
-) {
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
-  if (!canvas) {
-    throw new Error('canvas not found')
-  }
-  canvas.width = SIZE_X
-  canvas.height = SIZE_Y
+  constructor() {
+    this.circles = []
+    this.stats = new Stats()
+    this.hideNumbers = false
 
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    throw new Error('ctx is undefined')
-  }
-
-  COLORS.sort(() => 0.5 - Math.random())
-
-  const now = new Date().getTime()
-  const stats = new Stats()
-
-  let hideNumbers = false
-
-  let def: string[] = []
-  switch (gameType) {
-    case 'numbersAsc': {
-      for (let i = 0; i < AMOUNT; i++) {
-        def.push(String(i + 1))
-      }
-      break
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
+    if (!canvas) {
+      throw new Error('canvas not found')
     }
+    this.canvas = canvas
 
-    case 'numbersDesc': {
-      for (let i = AMOUNT; i > 0; i--) {
-        def.push(String(i))
-      }
-      break
+    const ctx = this.canvas.getContext('2d')
+    if (!ctx) {
+      throw new Error('ctx is undefined')
     }
-
-    case 'mixAsc': {
-      const alpha = getAlphabet(AMOUNT)
-      for (let i = 0; i < AMOUNT; i++) {
-        def.push(String(i + 1))
-        def.push(alpha[i])
-      }
-      def = def.slice(0, AMOUNT)
-      break
-    }
-
-    case 'lettersAsc': {
-      def = getAlphabet(AMOUNT)
-      break
-    }
-
-    case 'lettersDesc': {
-      def = getAlphabet(AMOUNT)
-      def.reverse()
-      break
-    }
+    this.ctx = ctx
   }
 
-  let circles: Circle[] = []
-
-  for (let i = 0; i < def.length; i++) {
-    const [centerX, centerY] = findFreeSpot(circles)
-    circles.push(new Circle(centerX, centerY, def[i], COLORS[i % 10]))
-  }
-
-  draw(ctx, circles, hideNumbers)
-
-  if (HIDE_AFTER) {
-    setTimeout(() => {
-      hideNumbers = true
-      draw(ctx, circles, hideNumbers)
-    }, HIDE_AFTER * 1000)
-  }
-
-  canvas.addEventListener('click', (e) => {
-    stats.click()
-    const clickedCircle = circles.find((circle) =>
-      circle.isInPath(ctx, e.offsetX, e.offsetY),
-    )
+  click(x: number, y: number) {
+    this.stats.click()
+    const clickedCircle = this.circles.find((circle) => circle.isInPath(x, y))
     if (!clickedCircle) {
       return
     }
 
-    if (circles.indexOf(clickedCircle) === 0) {
-      stats.foundNumber(clickedCircle.text)
-      circles = circles.filter((c) => c.text !== clickedCircle.text)
-      if (!circles.length) {
-        stats.finish()
-        stats.print()
+    if (this.circles.indexOf(clickedCircle) === 0) {
+      this.stats.foundNumber(clickedCircle.text)
+      this.circles = this.circles.filter((c) => c.text !== clickedCircle.text)
+      if (!this.circles.length) {
+        this.stats.finish()
+        this.stats.print()
       }
-      draw(ctx, circles, hideNumbers)
+      this.draw()
     }
-  })
+  }
 
-  canvas.addEventListener('mousemove', (e) => {
-    for (const circle of Object.values(circles)) {
-      if (circle.isInPath(ctx, e.offsetX, e.offsetY)) {
-        canvas.classList.add('pointer')
+  mouseMove(x: number, y: number) {
+    for (const circle of Object.values(this.circles)) {
+      if (circle.isInPath(x, y)) {
+        this.canvas.classList.add('pointer')
         return
       }
     }
-    canvas.classList.remove('pointer')
-  })
+    this.canvas.classList.remove('pointer')
+  }
+
+  clear() {
+    this.ctx.clearRect(0, 0, SIZE_X, SIZE_Y)
+  }
+
+  draw() {
+    this.clear()
+    for (const obj of this.circles) {
+      obj.draw(this.hideNumbers)
+    }
+  }
+
+  setup(gameType: GameType) {
+    this.canvas.width = SIZE_X
+    this.canvas.height = SIZE_Y
+
+    COLORS.sort(() => 0.5 - Math.random())
+
+    const definitions = getCircleDefinitions(gameType)
+    for (let i = 0; i < definitions.length; i++) {
+      const [centerX, centerY] = findFreeSpot(this.circles)
+      this.circles.push(
+        new Circle(this.ctx, centerX, centerY, definitions[i], COLORS[i % 10]),
+      )
+    }
+
+    this.draw()
+
+    if (HIDE_AFTER) {
+      setTimeout(() => {
+        this.hideNumbers = true
+        this.draw()
+      }, HIDE_AFTER * 1000)
+    }
+
+    this.canvas.addEventListener('click', (e) =>
+      this.click(e.offsetX, e.offsetY),
+    )
+
+    this.canvas.addEventListener('mousemove', (e) =>
+      this.mouseMove(e.offsetX, e.offsetY),
+    )
+  }
+}
+
+function main(gameType: GameType) {
+  const board = new Board()
+  board.setup(gameType)
 }
