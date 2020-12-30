@@ -36,6 +36,14 @@ function getAlphabet(limit: number) {
   return a.slice(0, limit).toUpperCase().split('')
 }
 
+function getElement(className: string) {
+  const el = document.getElementsByClassName(className)[0]
+  if (!el) {
+    throw new Error('.${className} not found')
+  }
+  return el as HTMLElement
+}
+
 class Stats {
   start: number
   end: number
@@ -226,20 +234,12 @@ class Board {
     this.stats = new Stats()
     this.hideNumbers = false
 
-    const canvasWrapper = document.getElementsByClassName('canvas-wrapper')[0]
-    if (!canvasWrapper) {
-      throw new Error('canvasContainer not found')
-    }
-    this.canvasWrapper = canvasWrapper as HTMLElement
+    this.canvasWrapper = getElement('canvas-wrapper')
 
     this.sizeX = 0
     this.sizeY = 0
 
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement | void
-    if (!canvas) {
-      throw new Error('canvas not found')
-    }
-    this.canvas = canvas
+    this.canvas = getElement('canvas') as HTMLCanvasElement
 
     const ctx = this.canvas.getContext('2d')
     if (!ctx) {
@@ -317,12 +317,7 @@ class Board {
   }
 
   setup(gameType: GameType) {
-    const newGameMenu = document.getElementsByClassName(
-      'new-game-menu',
-    )[0] as HTMLElement
-    if (!newGameMenu) {
-      throw new Error('newGameMenu not found')
-    }
+    const newGameMenu = getElement('new-game-menu')
     newGameMenu.style.display = 'none'
 
     this.canvasWrapper.style.display = 'block'
