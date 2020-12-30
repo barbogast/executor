@@ -223,14 +223,16 @@ function doesCollide(circles: Circle[], centerX: number, centerY: number) {
   return false
 }
 
+type Elements = {
+  canvasWrapper: HTMLElement
+  canvas: HTMLCanvasElement
+  newGameMenu: HTMLElement
+  finishGameMenu: HTMLElement
+  finishGameCode: HTMLElement
+}
+
 class Board {
-  elements: {
-    canvasWrapper: HTMLElement
-    canvas: HTMLCanvasElement
-    newGameMenu: HTMLElement
-    finishGameMenu: HTMLElement
-    finishGameCode: HTMLElement
-  }
+  elements: Elements
   ctx: CanvasRenderingContext2D
   circles: Circle[]
   stats: Stats
@@ -273,10 +275,8 @@ class Board {
       this.circles = this.circles.filter((c) => c.text !== clickedCircle.text)
       if (!this.circles.length) {
         this.stats.finish()
-        this.toggleVisibility(
-          this.elements.canvasWrapper,
-          this.elements.finishGameMenu,
-        )
+        this.hide('canvasWrapper')
+        this.show('finishGameMenu')
         this.elements.finishGameCode.innerHTML = this.stats.print()
       }
       this.draw()
@@ -333,16 +333,18 @@ class Board {
     }
   }
 
-  toggleVisibility(from: HTMLElement, to: HTMLElement) {
-    from.style.display = 'none'
-    to.style.display = 'block'
+  show(key: keyof Elements) {
+    this.elements[key].style.display = 'block'
+  }
+
+  hide(key: keyof Elements) {
+    this.elements[key].style.display = 'none'
   }
 
   setup(gameType: GameType) {
-    this.toggleVisibility(
-      this.elements.newGameMenu,
-      this.elements.canvasWrapper,
-    )
+    this.hide('newGameMenu')
+    this.hide('finishGameMenu')
+    this.show('canvasWrapper')
 
     this.sizeX = this.elements.canvasWrapper.clientWidth
     this.sizeY = this.elements.canvasWrapper.clientHeight
