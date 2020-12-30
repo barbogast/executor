@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tsc": "tsc",
+    "watch": "tsc --watch"
   },
   "author": "",
   "license": "ISC",
@@ -13,5 +14,8 @@
     "tabWidth": 2,
     "semi": false,
     "singleQuote": true
+  },
+  "dependencies": {
+    "typescript": "^4.1.3"
   }
 }
