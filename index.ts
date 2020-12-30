@@ -220,8 +220,11 @@ function doesCollide(circles: Circle[], centerX: number, centerY: number) {
 }
 
 class Board {
-  canvasWrapper: HTMLElement
-  canvas: HTMLCanvasElement
+  elements: {
+    canvasWrapper: HTMLElement
+    canvas: HTMLCanvasElement
+    newGameMenu: HTMLElement
+  }
   ctx: CanvasRenderingContext2D
   circles: Circle[]
   stats: Stats
@@ -234,14 +237,16 @@ class Board {
     this.stats = new Stats()
     this.hideNumbers = false
 
-    this.canvasWrapper = getElement('canvas-wrapper')
+    this.elements = {
+      canvasWrapper: getElement('canvas-wrapper'),
+      canvas: getElement('canvas') as HTMLCanvasElement,
+      newGameMenu: getElement('new-game-menu'),
+    }
 
     this.sizeX = 0
     this.sizeY = 0
 
-    this.canvas = getElement('canvas') as HTMLCanvasElement
-
-    const ctx = this.canvas.getContext('2d')
+    const ctx = this.elements.canvas.getContext('2d')
     if (!ctx) {
       throw new Error('ctx is undefined')
     }
@@ -260,6 +265,10 @@ class Board {
       this.circles = this.circles.filter((c) => c.text !== clickedCircle.text)
       if (!this.circles.length) {
         this.stats.finish()
+        this.toggleVisibility(
+          this.elements.canvasWrapper,
+          this.elements.newGameMenu,
+        )
         this.stats.print()
       }
       this.draw()
@@ -269,11 +278,11 @@ class Board {
   mouseMove(x: number, y: number) {
     for (const circle of Object.values(this.circles)) {
       if (circle.isInPath(x, y)) {
-        this.canvas.classList.add('pointer')
+        this.elements.canvas.classList.add('pointer')
         return
       }
     }
-    this.canvas.classList.remove('pointer')
+    this.elements.canvas.classList.remove('pointer')
   }
 
   clear() {
@@ -316,17 +325,22 @@ class Board {
     }
   }
 
+  toggleVisibility(from: HTMLElement, to: HTMLElement) {
+    from.style.display = 'none'
+    to.style.display = 'block'
+  }
+
   setup(gameType: GameType) {
-    const newGameMenu = getElement('new-game-menu')
-    newGameMenu.style.display = 'none'
+    this.toggleVisibility(
+      this.elements.newGameMenu,
+      this.elements.canvasWrapper,
+    )
 
-    this.canvasWrapper.style.display = 'block'
+    this.sizeX = this.elements.canvasWrapper.clientWidth
+    this.sizeY = this.elements.canvasWrapper.clientHeight
 
-    this.sizeX = this.canvasWrapper.clientWidth
-    this.sizeY = this.canvasWrapper.clientHeight
-
-    this.canvas.width = this.sizeX
-    this.canvas.height = this.sizeY
+    this.elements.canvas.width = this.sizeX
+    this.elements.canvas.height = this.sizeY
 
     COLORS.sort(() => 0.5 - Math.random())
 
@@ -347,11 +361,11 @@ class Board {
       }, HIDE_AFTER * 1000)
     }
 
-    this.canvas.addEventListener('click', (e) =>
+    this.elements.canvas.addEventListener('click', (e) =>
       this.click(e.offsetX, e.offsetY),
     )
 
-    this.canvas.addEventListener('mousemove', (e) =>
+    this.elements.canvas.addEventListener('mousemove', (e) =>
       this.mouseMove(e.offsetX, e.offsetY),
     )
   }
