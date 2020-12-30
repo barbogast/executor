@@ -49,7 +49,7 @@ class Stats {
   startCurrent: number
   clicks: number
   correctClicks: number
-  intervals: {number: string, duration: number}[]
+  intervals: { number: string; duration: number }[]
 
   constructor() {
     const now = getCurrentTimestamp()
@@ -136,7 +136,7 @@ class Circle {
   }
 
   isInPath(ctx: CanvasRenderingContext2D, x: number, y: number) {
-    if(!this._object){
+    if (!this._object) {
       throw new Error('path is undefined')
     }
     return ctx.isPointInPath(this._object, x, y)
@@ -190,20 +190,31 @@ function findFreeSpot(circles: Circle[]) {
   }
 }
 
-function draw(ctx: CanvasRenderingContext2D, objects: Circle[], hideNumbers: boolean) {
+function draw(
+  ctx: CanvasRenderingContext2D,
+  objects: Circle[],
+  hideNumbers: boolean,
+) {
   clear(ctx)
   for (const obj of objects) {
     obj.draw(ctx, hideNumbers)
   }
 }
 
-function main(gameType: 'numbersAsc' | 'numbersDesc' | 'mixAsc' | 'lettersAsc' | 'lettersDesc') {
+function main(
+  gameType:
+    | 'numbersAsc'
+    | 'numbersDesc'
+    | 'mixAsc'
+    | 'lettersAsc'
+    | 'lettersDesc',
+) {
   const canvas = document.getElementById('tutorial') as HTMLCanvasElement | void
-  if(!canvas){
+  if (!canvas) {
     throw new Error('canvas not found')
   }
   const ctx = canvas.getContext('2d')
-  if(!ctx){
+  if (!ctx) {
     throw new Error('ctx is undefined')
   }
 
