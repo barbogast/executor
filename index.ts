@@ -208,6 +208,51 @@ class Circle {
   }
 }
 
+class Targets {
+  private _targets: Circle[]
+  constructor() {
+    this._targets = []
+  }
+
+  add(circle: Circle) {
+    this._targets.push(circle)
+  }
+
+  findTarget(x: number, y: number) {
+    return this._targets.find((target) => target.isInPath(x, y))
+  }
+
+  tapTarget(target: Circle) {
+    const targetisCurrent = this._targets[0].text === target.text
+    if (targetisCurrent) {
+      this._targets.shift()
+    }
+    return targetisCurrent
+  }
+
+  isCurrentTarget(target: Circle) {
+    return this._targets.indexOf(target) === 0
+  }
+
+  allTargetsReached() {
+    return this._targets.length === 0
+  }
+
+  drawAll(ctx: CanvasRenderingContext2D, numbersAreHidden: boolean) {
+    for (const target of this._targets) {
+      target.draw(numbersAreHidden)
+    }
+  }
+
+  getNextNumber() {
+    return parseInt(this._targets[this._targets.length - 1].text) + 1
+  }
+
+  getTargets() {
+    return this._targets
+  }
+}
+
 function doesCollide(circles: Circle[], centerX: number, centerY: number) {
   for (const circle of circles) {
     if (
@@ -238,14 +283,14 @@ type Elements = {
 class Board {
   elements: Elements
   ctx: CanvasRenderingContext2D
-  circles: Circle[]
+  targets: Targets
   stats: Stats
   numbersAreHidden: boolean
   sizeX: number
   sizeY: number
 
   constructor() {
-    this.circles = []
+    this.targets = new Targets()
     this.stats = new Stats()
     this.numbersAreHidden = false
 
@@ -273,8 +318,8 @@ class Board {
     if (HIDE_AFTER_CLICK) {
       this.numbersAreHidden = true
     }
-    const clickedCircle = this.circles.find((circle) => circle.isInPath(x, y))
-    if (!clickedCircle) {
+    const target = this.targets.findTarget(x, y)
+    if (!target) {
       if (ADD_NUMBER_ON_MISCLICK) {
         this.addNumber()
         this.draw()
@@ -282,10 +327,10 @@ class Board {
       return
     }
 
-    if (this.circles.indexOf(clickedCircle) === 0) {
-      this.stats.foundNumber(clickedCircle.text)
-      this.circles = this.circles.filter((c) => c.text !== clickedCircle.text)
-      if (!this.circles.length) {
+    const targetIsCurrent = this.targets.tapTarget(target)
+    if (targetIsCurrent) {
+      this.stats.foundNumber(target.text as string)
+      if (this.targets.allTargetsReached()) {
         this.stats.finish()
         this.hide('canvasWrapper')
         this.show('finishGameMenu')
@@ -296,13 +341,11 @@ class Board {
   }
 
   mouseMove(x: number, y: number) {
-    for (const circle of Object.values(this.circles)) {
-      if (circle.isInPath(x, y)) {
-        this.elements.canvas.classList.add('pointer')
-        return
-      }
+    if (this.targets.findTarget(x, y)) {
+      this.elements.canvas.classList.add('pointer')
+    } else {
+      this.elements.canvas.classList.remove('pointer')
     }
-    this.elements.canvas.classList.remove('pointer')
   }
 
   clear() {
@@ -311,9 +354,7 @@ class Board {
 
   draw() {
     this.clear()
-    for (const obj of this.circles) {
-      obj.draw(this.numbersAreHidden)
-    }
+    this.targets.drawAll(this.ctx, this.numbersAreHidden)
   }
 
   findFreeSpot() {
@@ -337,7 +378,7 @@ class Board {
         continue
       }
 
-      if (doesCollide(this.circles, centerX, centerY)) {
+      if (doesCollide(this.targets.getTargets(), centerX, centerY)) {
         continue
       }
 
@@ -362,8 +403,8 @@ class Board {
 
   addNumber() {
     const [centerX, centerY] = this.findFreeSpot()
-    const nextNumber = parseInt(this.circles[this.circles.length - 1].text) + 1
-    this.circles.push(
+    const nextNumber = this.targets.getNextNumber()
+    this.targets.add(
       new Circle(
         this.ctx,
         centerX,
@@ -389,7 +430,7 @@ class Board {
 
     for (let i = 0; i < definitions.length; i++) {
       const [centerX, centerY] = this.findFreeSpot()
-      this.circles.push(
+      this.targets.add(
         new Circle(this.ctx, centerX, centerY, definitions[i], COLORS[i % 10]),
       )
     }
