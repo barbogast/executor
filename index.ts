@@ -265,8 +265,6 @@ function doesCollide(targets: Targets, centerX: number, centerY: number) {
       !(centerX < x - DIST * 2 || centerX > x + DIST * 2) &&
       !(centerY < y - DIST * 2 || centerY > y + DIST * 2)
     ) {
-      console.log('AAAA')
-
       doesCollide = true
       return true
     }
@@ -288,14 +286,12 @@ class Board {
   elements: Elements
   ctx: CanvasRenderingContext2D
   targets: Targets
-  stats: Stats
   numbersAreHidden: boolean
   sizeX: number
   sizeY: number
 
-  constructor() {
-    this.targets = new Targets()
-    this.stats = new Stats()
+  constructor(targets: Targets) {
+    this.targets = targets
     this.numbersAreHidden = false
 
     this.elements = {
@@ -317,31 +313,14 @@ class Board {
     this.ctx = ctx
   }
 
-  click(x: number, y: number) {
-    this.stats.click()
-    if (HIDE_AFTER_CLICK) {
-      this.numbersAreHidden = true
-    }
-    const target = this.targets.findTarget(x, y)
-    if (!target) {
-      if (ADD_NUMBER_ON_MISCLICK) {
-        this.addNumber()
-        this.draw()
-      }
-      return
-    }
+  getContext() {
+    return this.ctx
+  }
 
-    const targetIsCurrent = this.targets.tapTarget(target)
-    if (targetIsCurrent) {
-      this.stats.foundNumber(target.text as string)
-      if (this.targets.allTargetsReached()) {
-        this.stats.finish()
-        this.hide('canvasWrapper')
-        this.show('finishGameMenu')
-        this.elements.finishGameCode.innerHTML = this.stats.print()
-      }
-      this.draw()
-    }
+  registerOnClickHandler(callback: (circle: Circle | void) => void) {
+    this.elements.canvas.addEventListener('click', (e) =>
+      callback(this.targets.findTarget(e.offsetX, e.offsetY)),
+    )
   }
 
   mouseMove(x: number, y: number) {
@@ -398,28 +377,14 @@ class Board {
     this.elements[key].style.display = 'none'
   }
 
-  hideNumbers(delay: number) {
+  setNumberVisibility(isVisible: boolean, delay: number) {
     setTimeout(() => {
-      this.numbersAreHidden = true
+      this.numbersAreHidden = !isVisible
       this.draw()
     }, delay * 1000)
   }
 
-  addNumber() {
-    const [centerX, centerY] = this.findFreeSpot()
-    const nextNumber = this.targets.getNextNumber()
-    this.targets.add(
-      new Circle(
-        this.ctx,
-        centerX,
-        centerY,
-        String(nextNumber),
-        COLORS[nextNumber % 10],
-      ),
-    )
-  }
-
-  setup(definitions: string[]) {
+  setup() {
     this.hide('newGameMenu')
     this.hide('finishGameMenu')
     this.show('canvasWrapper')
@@ -430,56 +395,103 @@ class Board {
     this.elements.canvas.width = this.sizeX
     this.elements.canvas.height = this.sizeY
 
-    COLORS.sort(() => 0.5 - Math.random())
-
-    for (let i = 0; i < definitions.length; i++) {
-      const [centerX, centerY] = this.findFreeSpot()
-      this.targets.add(
-        new Circle(this.ctx, centerX, centerY, definitions[i], COLORS[i % 10]),
-      )
-    }
-
-    this.draw()
-
-    this.elements.canvas.addEventListener('click', (e) =>
-      this.click(e.offsetX, e.offsetY),
-    )
-
     this.elements.canvas.addEventListener('mousemove', (e) =>
       this.mouseMove(e.offsetX, e.offsetY),
     )
-
-    this.elements.showButton.addEventListener('click', () => {
-      this.numbersAreHidden = false
-      this.addNumber()
-      this.draw()
-      this.hideNumbers(2)
-    })
   }
 }
 
 class Game {
   gameType: GameType
+  targets: Targets
+  board: Board
+  stats: Stats
 
   constructor(gameType: GameType) {
     this.gameType = gameType
+    this.targets = new Targets()
+    this.board = new Board(this.targets)
+    this.stats = new Stats()
   }
 
   start() {
+    COLORS.sort(() => 0.5 - Math.random())
+
     const definitions = getCircleDefinitions(this.gameType)
 
-    const board = new Board()
-    board.setup(definitions)
+    this.board.setup()
+
+    for (let i = 0; i < definitions.length; i++) {
+      const [centerX, centerY] = this.board.findFreeSpot()
+      this.targets.add(
+        new Circle(
+          this.board.getContext(),
+          centerX,
+          centerY,
+          definitions[i],
+          COLORS[i % 10],
+        ),
+      )
+    }
+    this.board.draw()
+
+    this.board.registerOnClickHandler((circle) => this.onClick(circle))
+
+    this.board.elements.showButton.addEventListener('click', () => {
+      this.addNumber()
+      this.board.setNumberVisibility(true, 0)
+      this.board.setNumberVisibility(false, 2)
+    })
 
     if (HIDE_AFTER) {
-      board.hideNumbers(HIDE_AFTER)
+      this.board.setNumberVisibility(false, HIDE_AFTER)
     }
 
     if (AUTO_ADD_INTERVAL) {
       setInterval(() => {
-        board.addNumber()
-        board.draw()
+        this.addNumber()
+        this.board.draw()
       }, AUTO_ADD_INTERVAL * 1000)
+    }
+  }
+
+  addNumber() {
+    const [centerX, centerY] = this.board.findFreeSpot()
+    const nextNumber = this.targets.getNextNumber()
+    this.targets.add(
+      new Circle(
+        this.board.getContext(),
+        centerX,
+        centerY,
+        String(nextNumber),
+        COLORS[nextNumber % 10],
+      ),
+    )
+  }
+
+  onClick(target: Circle | void) {
+    this.stats.click()
+    if (HIDE_AFTER_CLICK) {
+      this.board.setNumberVisibility(false, 0)
+    }
+    if (!target) {
+      if (ADD_NUMBER_ON_MISCLICK) {
+        this.addNumber()
+        this.board.draw()
+      }
+      return
+    }
+
+    const targetIsCurrent = this.targets.tapTarget(target)
+    if (targetIsCurrent) {
+      this.stats.foundNumber(target.text as string)
+      if (this.targets.allTargetsReached()) {
+        this.stats.finish()
+        this.board.hide('canvasWrapper')
+        this.board.show('finishGameMenu')
+        this.board.elements.finishGameCode.innerHTML = this.stats.print()
+      }
+      this.board.draw()
     }
   }
 }
