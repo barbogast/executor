@@ -218,6 +218,15 @@ class Targets {
     this._targets.push(circle)
   }
 
+  forEach(callback: (x: number, y: number, text: string) => boolean | void) {
+    for (const target of this._targets) {
+      const abort = callback(target.centerX, target.centerY, target.text)
+      if (abort) {
+        return
+      }
+    }
+  }
+
   findTarget(x: number, y: number) {
     return this._targets.find((target) => target.isInPath(x, y))
   }
@@ -247,28 +256,23 @@ class Targets {
   getNextNumber() {
     return parseInt(this._targets[this._targets.length - 1].text) + 1
   }
-
-  getTargets() {
-    return this._targets
-  }
 }
 
-function doesCollide(circles: Circle[], centerX: number, centerY: number) {
-  for (const circle of circles) {
+function doesCollide(targets: Targets, centerX: number, centerY: number) {
+  let doesCollide = false
+  targets.forEach((x, y) => {
     if (
-      !(
-        centerX < circle.centerX - DIST * 2 ||
-        centerX > circle.centerX + DIST * 2
-      ) &&
-      !(
-        centerY < circle.centerY - DIST * 2 ||
-        centerY > circle.centerY + DIST * 2
-      )
+      !(centerX < x - DIST * 2 || centerX > x + DIST * 2) &&
+      !(centerY < y - DIST * 2 || centerY > y + DIST * 2)
     ) {
+      console.log('AAAA')
+
+      doesCollide = true
       return true
     }
-  }
-  return false
+  })
+
+  return doesCollide
 }
 
 type Elements = {
@@ -378,7 +382,7 @@ class Board {
         continue
       }
 
-      if (doesCollide(this.targets.getTargets(), centerX, centerY)) {
+      if (doesCollide(this.targets, centerX, centerY)) {
         continue
       }
 
