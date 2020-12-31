@@ -7,6 +7,7 @@ const DIST = RADIUS + RADIUS * 0.1
 const HIDE_AFTER = 3
 const HIDE_AFTER_CLICK = false
 const AUTO_ADD_INTERVAL = 5
+const ADD_NUMBER_ON_MISCLICK = true
 
 const COLORS = [
   // https://coolors.co/a86282-9a75a3-7998af-71afbb-6ac1c8-d3dcad-e9c6af-fab6ad-f6958e-f07270
@@ -274,6 +275,10 @@ class Board {
     }
     const clickedCircle = this.circles.find((circle) => circle.isInPath(x, y))
     if (!clickedCircle) {
+      if (ADD_NUMBER_ON_MISCLICK) {
+        this.addNumber()
+        this.draw()
+      }
       return
     }
 
