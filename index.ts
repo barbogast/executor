@@ -374,7 +374,7 @@ class Board {
     )
   }
 
-  setup(gameType: GameType) {
+  setup(definitions: string[]) {
     this.hide('newGameMenu')
     this.hide('finishGameMenu')
     this.show('canvasWrapper')
@@ -387,7 +387,6 @@ class Board {
 
     COLORS.sort(() => 0.5 - Math.random())
 
-    const definitions = getCircleDefinitions(gameType)
     for (let i = 0; i < definitions.length; i++) {
       const [centerX, centerY] = this.findFreeSpot()
       this.circles.push(
@@ -396,17 +395,6 @@ class Board {
     }
 
     this.draw()
-
-    if (HIDE_AFTER) {
-      this.hideNumbers(HIDE_AFTER)
-    }
-
-    if (AUTO_ADD_INTERVAL) {
-      setInterval(() => {
-        this.addNumber()
-        this.draw()
-      }, AUTO_ADD_INTERVAL * 1000)
-    }
 
     this.elements.canvas.addEventListener('click', (e) =>
       this.click(e.offsetX, e.offsetY),
@@ -425,7 +413,32 @@ class Board {
   }
 }
 
+class Game {
+  gameType: GameType
+
+  constructor(gameType: GameType) {
+    this.gameType = gameType
+  }
+
+  start() {
+    const definitions = getCircleDefinitions(this.gameType)
+
+    const board = new Board()
+    board.setup(definitions)
+
+    if (HIDE_AFTER) {
+      board.hideNumbers(HIDE_AFTER)
+    }
+
+    if (AUTO_ADD_INTERVAL) {
+      setInterval(() => {
+        board.addNumber()
+        board.draw()
+      }, AUTO_ADD_INTERVAL * 1000)
+    }
+  }
+}
+
 function main(gameType: GameType) {
-  const board = new Board()
-  board.setup(gameType)
+  new Game(gameType).start()
 }
