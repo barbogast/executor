@@ -4,7 +4,8 @@ const FONTSIZE = 26
 const RADIUS = 25
 const DIST = RADIUS + RADIUS * 0.1
 
-const HIDE_AFTER = 5
+const HIDE_AFTER = 3
+const HIDE_AFTER_CLICK = false
 
 const COLORS = [
   // https://coolors.co/a86282-9a75a3-7998af-71afbb-6ac1c8-d3dcad-e9c6af-fab6ad-f6958e-f07270
@@ -229,6 +230,7 @@ type Elements = {
   newGameMenu: HTMLElement
   finishGameMenu: HTMLElement
   finishGameCode: HTMLElement
+  showButton: HTMLElement
 }
 
 class Board {
@@ -236,14 +238,14 @@ class Board {
   ctx: CanvasRenderingContext2D
   circles: Circle[]
   stats: Stats
-  hideNumbers: boolean
+  numbersAreHidden: boolean
   sizeX: number
   sizeY: number
 
   constructor() {
     this.circles = []
     this.stats = new Stats()
-    this.hideNumbers = false
+    this.numbersAreHidden = false
 
     this.elements = {
       canvasWrapper: getElement('canvas-wrapper'),
@@ -251,6 +253,7 @@ class Board {
       newGameMenu: getElement('new-game-menu'),
       finishGameMenu: getElement('finish-game-menu'),
       finishGameCode: getElement('finish-game-code'),
+      showButton: getElement('show'),
     }
 
     this.sizeX = 0
@@ -265,6 +268,9 @@ class Board {
 
   click(x: number, y: number) {
     this.stats.click()
+    if (HIDE_AFTER_CLICK) {
+      this.numbersAreHidden = true
+    }
     const clickedCircle = this.circles.find((circle) => circle.isInPath(x, y))
     if (!clickedCircle) {
       return
@@ -300,7 +306,7 @@ class Board {
   draw() {
     this.clear()
     for (const obj of this.circles) {
-      obj.draw(this.hideNumbers)
+      obj.draw(this.numbersAreHidden)
     }
   }
 
@@ -341,6 +347,27 @@ class Board {
     this.elements[key].style.display = 'none'
   }
 
+  hideNumbers(delay: number) {
+    setTimeout(() => {
+      this.numbersAreHidden = true
+      this.draw()
+    }, delay * 1000)
+  }
+
+  addNumber() {
+    const [centerX, centerY] = this.findFreeSpot()
+    const nextNumber = parseInt(this.circles[this.circles.length - 1].text) + 1
+    this.circles.push(
+      new Circle(
+        this.ctx,
+        centerX,
+        centerY,
+        String(nextNumber),
+        COLORS[nextNumber % 10],
+      ),
+    )
+  }
+
   setup(gameType: GameType) {
     this.hide('newGameMenu')
     this.hide('finishGameMenu')
@@ -365,11 +392,13 @@ class Board {
     this.draw()
 
     if (HIDE_AFTER) {
-      setTimeout(() => {
-        this.hideNumbers = true
-        this.draw()
-      }, HIDE_AFTER * 1000)
+      this.hideNumbers(HIDE_AFTER)
     }
+
+    setInterval(() => {
+      this.addNumber()
+      this.draw()
+    }, 5000)
 
     this.elements.canvas.addEventListener('click', (e) =>
       this.click(e.offsetX, e.offsetY),
@@ -378,6 +407,13 @@ class Board {
     this.elements.canvas.addEventListener('mousemove', (e) =>
       this.mouseMove(e.offsetX, e.offsetY),
     )
+
+    this.elements.showButton.addEventListener('click', () => {
+      this.numbersAreHidden = false
+      this.addNumber()
+      this.draw()
+      this.hideNumbers(2)
+    })
   }
 }
 
