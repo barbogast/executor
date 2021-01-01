@@ -110,14 +110,15 @@ Misclicks: ${this.clicks - this.correctClicks}
 }
 
 class Timers {
-  _timers: number[]
+  _timers: Set<number>
 
   constructor() {
-    this._timers = []
+    this._timers = new Set()
   }
 
-  _removeId(idToRemove: number) {
-    this._timers = this._timers.filter((id) => id !== idToRemove)
+  _clear(id: number) {
+    clearTimeout(id)
+    this._timers.delete(id)
   }
 
   setTimeout(callback: () => void, ms: number) {
@@ -128,9 +129,10 @@ class Timers {
 
     const timeoutId = setTimeout(() => {
       callback()
-      this._removeId(timeoutId)
+      this._timers.delete(timeoutId)
     }, ms)
-    this._timers.push(timeoutId)
+    this._timers.add(timeoutId)
+    return () => this._clear(timeoutId)
   }
 
   setInterval(callback: () => void, ms: number) {
@@ -139,16 +141,14 @@ class Timers {
       return
     }
 
-    const intervalId = setInterval(() => {
-      callback()
-      this._removeId(intervalId)
-    }, ms)
-    this._timers.push(intervalId)
+    const intervalId = setInterval(callback, ms)
+    this._timers.add(intervalId)
+    return () => this._clear(intervalId)
   }
 
-  cancelAll() {
+  clearAll() {
     this._timers.forEach(clearTimeout)
-    this._timers = []
+    this._timers = new Set()
     // clearTimeout can be used for both setTimeout and setInterval
   }
 }
