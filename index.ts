@@ -148,61 +148,136 @@ class Timers {
 // Singleton, no need for separate instances
 const timers = new Timers()
 
-type GameType =
-  | 'numbersAsc'
-  | 'numbersDesc'
-  | 'mixAsc'
-  | 'lettersAsc'
-  | 'lettersDesc'
-
 type GameConfig = {
-  gameType: GameType
   amount: number
   addNumberOnMisclick: boolean
   autoAddNumberInterval: number
   hideNumbersAfter: number
   hideAfterFirstClick: boolean
+  symbolGenerator: SymbolGenerator
 }
 
-function getCircleDefinitions(gameType: GameType, amount: number) {
-  let def: string[] = []
-  switch (gameType) {
-    case 'numbersAsc': {
-      for (let i = 0; i < amount; i++) {
-        def.push(String(i + 1))
-      }
-      break
-    }
+interface SymbolGenerator {
+  isLast(): boolean
+  next(): string
+  getColor(): string
+}
 
-    case 'numbersDesc': {
-      for (let i = amount; i > 0; i--) {
-        def.push(String(i))
-      }
-      break
-    }
-
-    case 'mixAsc': {
-      const alpha = getAlphabet(amount)
-      for (let i = 0; i < amount; i++) {
-        def.push(String(i + 1))
-        def.push(alpha[i])
-      }
-      def = def.slice(0, amount)
-      break
-    }
-
-    case 'lettersAsc': {
-      def = getAlphabet(amount)
-      break
-    }
-
-    case 'lettersDesc': {
-      def = getAlphabet(amount)
-      def.reverse()
-      break
-    }
+class NumericAsc implements SymbolGenerator {
+  _current: number
+  constructor() {
+    this._current = 0
   }
-  return def
+
+  isLast() {
+    return false
+  }
+
+  next() {
+    if (!this.isLast()) {
+      this._current += 1
+    }
+    return String(this._current)
+  }
+
+  getColor() {
+    return COLORS[this._current % 10]
+  }
+}
+
+class NumericDesc implements SymbolGenerator {
+  _current: number
+  constructor(start: number) {
+    this._current = start + 1
+  }
+
+  isLast() {
+    return this._current === 1
+  }
+
+  next() {
+    if (!this.isLast()) {
+      this._current -= 1
+    }
+    return String(this._current)
+  }
+
+  getColor() {
+    return COLORS[this._current % 10]
+  }
+}
+
+class AlphaAsc implements SymbolGenerator {
+  _current: number
+  constructor() {
+    this._current = -1 // 0 'equals 'a'
+  }
+
+  isLast() {
+    return this._current === 25
+  }
+
+  next() {
+    if (!this.isLast()) {
+      this._current += 1
+    }
+    return (this._current + 10).toString(36).toUpperCase()
+  }
+
+  getColor() {
+    return COLORS[this._current % 10]
+  }
+}
+
+class AlphaDesc implements SymbolGenerator {
+  _current: number
+  constructor(startLetter: string) {
+    this._current = startLetter.toLowerCase().charCodeAt(0) - 96
+  }
+
+  isLast() {
+    return this._current === 0
+  }
+
+  next() {
+    if (!this.isLast()) {
+      this._current -= 1
+    }
+    return (this._current + 10).toString(36).toUpperCase()
+  }
+
+  getColor() {
+    return COLORS[this._current % 10]
+  }
+}
+
+class MixAsc {
+  _series: string[]
+  _current: number
+  constructor() {
+    this._series = []
+    const alpha = getAlphabet(36)
+    alpha.forEach((letter, i) => {
+      this._series.push(String(i))
+      this._series.push(letter)
+    })
+    this._current = 0
+  }
+
+  isLast() {
+    return this._current + 1 === this._series.length
+  }
+
+  next() {
+    if (!this.isLast()) {
+      this._current += 1
+    }
+    return this._series[this._current]
+  }
+
+  getColor() {
+    return COLORS[this._current % 10]
+  }
 }
 
 class Circle {
@@ -299,10 +374,6 @@ class Targets {
     for (const target of this._targets) {
       target.draw(numbersAreHidden)
     }
-  }
-
-  getNextNumber() {
-    return parseInt(this._targets[this._targets.length - 1].text) + 1
   }
 }
 
@@ -478,24 +549,10 @@ class Game {
 
     COLORS.sort(() => 0.5 - Math.random())
 
-    const definitions = getCircleDefinitions(
-      this.gameConfig.gameType,
-      this.gameConfig.amount,
-    )
-
     this.board.setup()
 
-    for (let i = 0; i < definitions.length; i++) {
-      const [centerX, centerY] = this.board.findFreeSpot()
-      this.targets.add(
-        new Circle(
-          this.board.getContext(),
-          centerX,
-          centerY,
-          definitions[i],
-          COLORS[i % 10],
-        ),
-      )
+    for (let i = 0; i < this.gameConfig.amount; i++) {
+      this.addNumber()
     }
     this.board.draw()
 
@@ -522,14 +579,17 @@ class Game {
 
   addNumber() {
     const [centerX, centerY] = this.board.findFreeSpot()
-    const nextNumber = this.targets.getNextNumber()
+    if (this.gameConfig.symbolGenerator.isLast()) {
+      return
+    }
+    const nextNumber = this.gameConfig.symbolGenerator.next()
     this.targets.add(
       new Circle(
         this.board.getContext(),
         centerX,
         centerY,
         String(nextNumber),
-        COLORS[nextNumber % 10],
+        this.gameConfig.symbolGenerator.getColor(),
       ),
     )
   }
@@ -568,12 +628,12 @@ function main() {
 
   ui.elements.newButton.addEventListener('click', () => {
     const gameConfig: GameConfig = {
-      gameType: 'numbersAsc',
       amount: 2,
       addNumberOnMisclick: true,
       autoAddNumberInterval: 5,
       hideNumbersAfter: 3,
       hideAfterFirstClick: true,
+      symbolGenerator: new MixAsc(),
     }
 
     timers.clearAll()
