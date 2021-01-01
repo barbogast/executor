@@ -326,6 +326,7 @@ type Elements = {
   finishGameMenu: HTMLElement
   finishGameCode: HTMLElement
   showButton: HTMLElement
+  newButton: HTMLElement
 }
 
 class UI {
@@ -338,6 +339,7 @@ class UI {
       newGameMenu: getElement('new-game-menu'),
       finishGameMenu: getElement('finish-game-menu'),
       finishGameCode: getElement('finish-game-code'),
+      newButton: getElement('new'),
       showButton: getElement('show'),
     }
   }
@@ -359,7 +361,7 @@ class Board {
   sizeY: number
   ui: UI
 
-  constructor(targets: Targets, ui: UI) {
+  constructor(ui: UI, targets: Targets) {
     this.targets = targets
     this.ui = ui
     this.numbersAreHidden = false
@@ -460,14 +462,16 @@ class Game {
   stats: Stats
   ui: UI
 
-  constructor() {
-    this.targets = new Targets()
-    this.ui = new UI()
-    this.board = new Board(this.targets, this.ui)
+  constructor(ui: UI, board: Board, targets: Targets) {
     this.stats = new Stats()
+    this.board = board
+    this.ui = ui
+    this.targets = targets
   }
 
   start(gameType: GameType) {
+    this.board.clear()
+
     COLORS.sort(() => 0.5 - Math.random())
 
     const definitions = getCircleDefinitions(gameType)
@@ -490,6 +494,7 @@ class Game {
 
     this.board.registerOnClickHandler((circle) => this.onClick(circle))
 
+    this.ui.show('showButton')
     this.ui.elements.showButton.addEventListener('click', () => {
       this.addNumber()
       this.board.setNumberVisibility(true, 0)
@@ -542,13 +547,23 @@ class Game {
         this.stats.finish()
         this.ui.hide('canvasWrapper')
         this.ui.show('finishGameMenu')
+        this.ui.hide('showButton')
         this.ui.elements.finishGameCode.innerHTML = this.stats.print()
+        timers.clearAll()
       }
       this.board.draw()
     }
   }
 }
 
-function main(gameType: GameType) {
-  new Game().start(gameType)
+function main() {
+  const ui = new UI()
+
+  ui.elements.newButton.addEventListener('click', () => {
+    timers.clearAll()
+    const targets = new Targets()
+    const board = new Board(ui, targets)
+    const game = new Game(ui, board, targets)
+    game.start('numbersAsc')
+  })
 }

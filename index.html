@@ -56,24 +56,32 @@
         display: block;
         font-size: 16px;
       }
+
+      .header {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .show {
+        display: none;
+      }
     </style>
   </head>
-  <body>
+  <body onload="main()">
     <div class="main-container">
-      <button class="show">Show</button>
+      <div class="header">
+        <button class="new">New game</button>
+        <button class="show">Show</button>
+      </div>
       <div class="new-game-menu"></div>
       <div class="game-container">
         <div class="canvas-wrapper">
           <canvas class="canvas"></canvas>
         </div>
 
-        <div class="new-game-menu">
-          <button onclick="main('numbersAsc');">New game</button>
-        </div>
         <div class="finish-game-menu">
           Congrats
           <code class="finish-game-code"></code>
-          <button onclick="main('numbersAsc');">New game</button>
         </div>
       </div>
     </div>
