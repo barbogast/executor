@@ -402,22 +402,20 @@ class Board {
 }
 
 class Game {
-  gameType: GameType
   targets: Targets
   board: Board
   stats: Stats
 
-  constructor(gameType: GameType) {
-    this.gameType = gameType
+  constructor() {
     this.targets = new Targets()
     this.board = new Board(this.targets)
     this.stats = new Stats()
   }
 
-  start() {
+  start(gameType: GameType) {
     COLORS.sort(() => 0.5 - Math.random())
 
-    const definitions = getCircleDefinitions(this.gameType)
+    const definitions = getCircleDefinitions(gameType)
 
     this.board.setup()
 
@@ -497,5 +495,5 @@ class Game {
 }
 
 function main(gameType: GameType) {
-  new Game(gameType).start()
+  new Game().start(gameType)
 }
