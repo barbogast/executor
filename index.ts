@@ -370,7 +370,7 @@ class Targets {
     return this._targets.length === 0
   }
 
-  drawAll(ctx: CanvasRenderingContext2D, numbersAreHidden: boolean) {
+  drawAll(numbersAreHidden: boolean) {
     for (const target of this._targets) {
       target.draw(numbersAreHidden)
     }
@@ -473,7 +473,7 @@ class Board {
 
   draw() {
     this.clear()
-    this.targets.drawAll(this.ctx, this.numbersAreHidden)
+    this.targets.drawAll(this.numbersAreHidden)
   }
 
   findFreeSpot() {
