@@ -109,6 +109,52 @@ Misclicks: ${this.clicks - this.correctClicks}
   }
 }
 
+class Timers {
+  _timers: number[]
+
+  constructor() {
+    this._timers = []
+  }
+
+  _removeId(idToRemove: number) {
+    this._timers = this._timers.filter((id) => id !== idToRemove)
+  }
+
+  setTimeout(callback: () => void, ms: number) {
+    if (ms === 0) {
+      callback()
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      callback()
+      this._removeId(timeoutId)
+    }, ms)
+    this._timers.push(timeoutId)
+  }
+
+  setInterval(callback: () => void, ms: number) {
+    if (ms === 0) {
+      callback()
+      return
+    }
+
+    const intervalId = setInterval(() => {
+      callback()
+      this._removeId(intervalId)
+    }, ms)
+    this._timers.push(intervalId)
+  }
+
+  cancelAll() {
+    this._timers.forEach(clearTimeout)
+    this._timers = []
+    // clearTimeout can be used for both setTimeout and setInterval
+  }
+}
+// Singleton, no need for separate instances
+const timers = new Timers()
+
 type GameType =
   | 'numbersAsc'
   | 'numbersDesc'
@@ -385,7 +431,7 @@ class Board {
   }
 
   setNumberVisibility(isVisible: boolean, delay: number) {
-    setTimeout(() => {
+    timers.setTimeout(() => {
       this.numbersAreHidden = !isVisible
       this.draw()
     }, delay * 1000)
@@ -455,7 +501,7 @@ class Game {
     }
 
     if (AUTO_ADD_INTERVAL) {
-      setInterval(() => {
+      timers.setInterval(() => {
         this.addNumber()
         this.board.draw()
       }, AUTO_ADD_INTERVAL * 1000)
