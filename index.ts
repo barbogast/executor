@@ -399,7 +399,8 @@ type Elements = {
   finishGameMenu: HTMLElement
   finishGameCode: HTMLElement
   showButton: HTMLElement
-  newButton: HTMLElement
+  newButton1: HTMLElement
+  header: HTMLElement
 }
 
 class UI {
@@ -554,6 +555,7 @@ class Game {
   }
 
   start() {
+    this.ui.show('header')
     this.board.clear()
 
     COLORS.sort(() => 0.5 - Math.random())
@@ -635,7 +637,8 @@ class Game {
 function main() {
   const ui = new UI()
 
-  ui.elements.newButton.addEventListener('click', () => {
+  ui.hide('header')
+  ui.elements.newButton1.addEventListener('click', () => {
     const gameConfig: GameConfig = {
       amount: 2,
       addNumberOnMisclick: true,
