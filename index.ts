@@ -282,18 +282,10 @@ type Elements = {
   showButton: HTMLElement
 }
 
-class Board {
+class UI {
   elements: Elements
-  ctx: CanvasRenderingContext2D
-  targets: Targets
-  numbersAreHidden: boolean
-  sizeX: number
-  sizeY: number
 
-  constructor(targets: Targets) {
-    this.targets = targets
-    this.numbersAreHidden = false
-
+  constructor() {
     this.elements = {
       canvasWrapper: getElement('canvas-wrapper'),
       canvas: getElement('canvas') as HTMLCanvasElement,
@@ -302,11 +294,34 @@ class Board {
       finishGameCode: getElement('finish-game-code'),
       showButton: getElement('show'),
     }
+  }
+
+  show(key: keyof Elements) {
+    this.elements[key].style.display = 'block'
+  }
+
+  hide(key: keyof Elements) {
+    this.elements[key].style.display = 'none'
+  }
+}
+
+class Board {
+  ctx: CanvasRenderingContext2D
+  targets: Targets
+  numbersAreHidden: boolean
+  sizeX: number
+  sizeY: number
+  ui: UI
+
+  constructor(targets: Targets, ui: UI) {
+    this.targets = targets
+    this.ui = ui
+    this.numbersAreHidden = false
 
     this.sizeX = 0
     this.sizeY = 0
 
-    const ctx = this.elements.canvas.getContext('2d')
+    const ctx = this.ui.elements.canvas.getContext('2d')
     if (!ctx) {
       throw new Error('ctx is undefined')
     }
@@ -318,16 +333,16 @@ class Board {
   }
 
   registerOnClickHandler(callback: (circle: Circle | void) => void) {
-    this.elements.canvas.addEventListener('click', (e) =>
+    this.ui.elements.canvas.addEventListener('click', (e) =>
       callback(this.targets.findTarget(e.offsetX, e.offsetY)),
     )
   }
 
   mouseMove(x: number, y: number) {
     if (this.targets.findTarget(x, y)) {
-      this.elements.canvas.classList.add('pointer')
+      this.ui.elements.canvas.classList.add('pointer')
     } else {
-      this.elements.canvas.classList.remove('pointer')
+      this.ui.elements.canvas.classList.remove('pointer')
     }
   }
 
@@ -369,14 +384,6 @@ class Board {
     }
   }
 
-  show(key: keyof Elements) {
-    this.elements[key].style.display = 'block'
-  }
-
-  hide(key: keyof Elements) {
-    this.elements[key].style.display = 'none'
-  }
-
   setNumberVisibility(isVisible: boolean, delay: number) {
     setTimeout(() => {
       this.numbersAreHidden = !isVisible
@@ -385,17 +392,17 @@ class Board {
   }
 
   setup() {
-    this.hide('newGameMenu')
-    this.hide('finishGameMenu')
-    this.show('canvasWrapper')
+    this.ui.hide('newGameMenu')
+    this.ui.hide('finishGameMenu')
+    this.ui.show('canvasWrapper')
 
-    this.sizeX = this.elements.canvasWrapper.clientWidth
-    this.sizeY = this.elements.canvasWrapper.clientHeight
+    this.sizeX = this.ui.elements.canvasWrapper.clientWidth
+    this.sizeY = this.ui.elements.canvasWrapper.clientHeight
 
-    this.elements.canvas.width = this.sizeX
-    this.elements.canvas.height = this.sizeY
+    this.ui.elements.canvas.width = this.sizeX
+    this.ui.elements.canvas.height = this.sizeY
 
-    this.elements.canvas.addEventListener('mousemove', (e) =>
+    this.ui.elements.canvas.addEventListener('mousemove', (e) =>
       this.mouseMove(e.offsetX, e.offsetY),
     )
   }
@@ -405,10 +412,12 @@ class Game {
   targets: Targets
   board: Board
   stats: Stats
+  ui: UI
 
   constructor() {
     this.targets = new Targets()
-    this.board = new Board(this.targets)
+    this.ui = new UI()
+    this.board = new Board(this.targets, this.ui)
     this.stats = new Stats()
   }
 
@@ -435,7 +444,7 @@ class Game {
 
     this.board.registerOnClickHandler((circle) => this.onClick(circle))
 
-    this.board.elements.showButton.addEventListener('click', () => {
+    this.ui.elements.showButton.addEventListener('click', () => {
       this.addNumber()
       this.board.setNumberVisibility(true, 0)
       this.board.setNumberVisibility(false, 2)
@@ -485,9 +494,9 @@ class Game {
       this.stats.foundNumber(target.text as string)
       if (this.targets.allTargetsReached()) {
         this.stats.finish()
-        this.board.hide('canvasWrapper')
-        this.board.show('finishGameMenu')
-        this.board.elements.finishGameCode.innerHTML = this.stats.print()
+        this.ui.hide('canvasWrapper')
+        this.ui.show('finishGameMenu')
+        this.ui.elements.finishGameCode.innerHTML = this.stats.print()
       }
       this.board.draw()
     }
