@@ -1,13 +1,6 @@
-const AMOUNT = 10
-
 const FONTSIZE = 26
 const RADIUS = 25
 const DIST = RADIUS + RADIUS * 0.1
-
-const HIDE_AFTER = 3
-const HIDE_AFTER_CLICK = false
-const AUTO_ADD_INTERVAL = 5
-const ADD_NUMBER_ON_MISCLICK = true
 
 const COLORS = [
   // https://coolors.co/a86282-9a75a3-7998af-71afbb-6ac1c8-d3dcad-e9c6af-fab6ad-f6958e-f07270
@@ -162,40 +155,49 @@ type GameType =
   | 'lettersAsc'
   | 'lettersDesc'
 
-function getCircleDefinitions(gameType: GameType) {
+type GameConfig = {
+  gameType: GameType
+  amount: number
+  addNumberOnMisclick: boolean
+  autoAddNumberInterval: number
+  hideNumbersAfter: number
+  hideAfterFirstClick: boolean
+}
+
+function getCircleDefinitions(gameType: GameType, amount: number) {
   let def: string[] = []
   switch (gameType) {
     case 'numbersAsc': {
-      for (let i = 0; i < AMOUNT; i++) {
+      for (let i = 0; i < amount; i++) {
         def.push(String(i + 1))
       }
       break
     }
 
     case 'numbersDesc': {
-      for (let i = AMOUNT; i > 0; i--) {
+      for (let i = amount; i > 0; i--) {
         def.push(String(i))
       }
       break
     }
 
     case 'mixAsc': {
-      const alpha = getAlphabet(AMOUNT)
-      for (let i = 0; i < AMOUNT; i++) {
+      const alpha = getAlphabet(amount)
+      for (let i = 0; i < amount; i++) {
         def.push(String(i + 1))
         def.push(alpha[i])
       }
-      def = def.slice(0, AMOUNT)
+      def = def.slice(0, amount)
       break
     }
 
     case 'lettersAsc': {
-      def = getAlphabet(AMOUNT)
+      def = getAlphabet(amount)
       break
     }
 
     case 'lettersDesc': {
-      def = getAlphabet(AMOUNT)
+      def = getAlphabet(amount)
       def.reverse()
       break
     }
@@ -461,20 +463,25 @@ class Game {
   board: Board
   stats: Stats
   ui: UI
+  gameConfig: GameConfig
 
-  constructor(ui: UI, board: Board, targets: Targets) {
+  constructor(ui: UI, board: Board, targets: Targets, gameConfig: GameConfig) {
     this.stats = new Stats()
     this.board = board
     this.ui = ui
     this.targets = targets
+    this.gameConfig = gameConfig
   }
 
-  start(gameType: GameType) {
+  start() {
     this.board.clear()
 
     COLORS.sort(() => 0.5 - Math.random())
 
-    const definitions = getCircleDefinitions(gameType)
+    const definitions = getCircleDefinitions(
+      this.gameConfig.gameType,
+      this.gameConfig.amount,
+    )
 
     this.board.setup()
 
@@ -501,15 +508,15 @@ class Game {
       this.board.setNumberVisibility(false, 2)
     })
 
-    if (HIDE_AFTER) {
-      this.board.setNumberVisibility(false, HIDE_AFTER)
+    if (this.gameConfig.hideNumbersAfter) {
+      this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter)
     }
 
-    if (AUTO_ADD_INTERVAL) {
+    if (this.gameConfig.autoAddNumberInterval) {
       timers.setInterval(() => {
         this.addNumber()
         this.board.draw()
-      }, AUTO_ADD_INTERVAL * 1000)
+      }, this.gameConfig.autoAddNumberInterval * 1000)
     }
   }
 
@@ -529,11 +536,11 @@ class Game {
 
   onClick(target: Circle | void) {
     this.stats.click()
-    if (HIDE_AFTER_CLICK) {
+    if (this.gameConfig.hideAfterFirstClick) {
       this.board.setNumberVisibility(false, 0)
     }
     if (!target) {
-      if (ADD_NUMBER_ON_MISCLICK) {
+      if (this.gameConfig.addNumberOnMisclick) {
         this.addNumber()
         this.board.draw()
       }
@@ -560,10 +567,20 @@ function main() {
   const ui = new UI()
 
   ui.elements.newButton.addEventListener('click', () => {
+    const gameConfig: GameConfig = {
+      gameType: 'numbersAsc',
+      amount: 2,
+      addNumberOnMisclick: true,
+      autoAddNumberInterval: 5,
+      hideNumbersAfter: 3,
+      hideAfterFirstClick: true,
+    }
+
     timers.clearAll()
     const targets = new Targets()
     const board = new Board(ui, targets)
-    const game = new Game(ui, board, targets)
-    game.start('numbersAsc')
+    const game = new Game(ui, board, targets, gameConfig)
+
+    game.start()
   })
 }
