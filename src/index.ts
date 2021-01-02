@@ -33,9 +33,15 @@ class Main {
 
   init() {
     this.ui.hide('inGameMenu')
+    this.ui.hide('canvas')
     this.ui.elements.newButton1.addEventListener('click', () =>
       this.startGame(),
     )
+    this.ui.elements.abort.addEventListener('click', () => {
+      this.ui.show('newGameMenu')
+      this.ui.hide('inGameMenu')
+      this.ui.hide('canvas')
+    })
   }
 
   startGame() {
@@ -54,5 +60,6 @@ class Main {
     const game = new Game(this.ui, board, targets, gameConfig)
 
     game.start()
+    this.ui.show('canvas')
   }
 }

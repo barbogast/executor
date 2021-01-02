@@ -7,6 +7,7 @@ type Elements = {
   showButton: HTMLElement
   newButton1: HTMLElement
   inGameMenu: HTMLElement
+  abort: HTMLElement
 }
 
 function getElement(className: string) {
@@ -31,6 +32,7 @@ class UI {
       newButton1: getElement('new1'),
       showButton: getElement('show'),
       inGameMenu: getElement('in-game-menu'),
+      abort: getElement('abort'),
     }
     this._display = {}
   }
