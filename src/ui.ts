@@ -7,6 +7,13 @@ type Elements = {
   showButton: HTMLElement
   newButton1: HTMLElement
   header: HTMLElement
+
+function getElement(className: string) {
+  const el = document.getElementsByClassName(className)[0]
+  if (!el) {
+    throw new Error('.${className} not found')
+  }
+  return el as HTMLElement
 }
 
 class UI {
