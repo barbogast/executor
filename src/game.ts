@@ -88,8 +88,10 @@ class Game {
       }
       this.board.draw()
     } else {
-      this.addNumber()
-      this.board.draw()
+      if (this.gameConfig.addNumberOnMisclick) {
+        this.addNumber()
+        this.board.draw()
+      }
     }
   }
 }
