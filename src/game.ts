@@ -14,7 +14,7 @@ class Game {
   }
 
   start() {
-    this.ui.show('header')
+    this.ui.show('inGameMenu')
     this.board.clear()
 
     COLORS.sort(() => 0.5 - Math.random())

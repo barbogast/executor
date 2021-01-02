@@ -44,7 +44,7 @@ type GameConfig = {
 function main() {
   const ui = new UI()
 
-  ui.hide('header')
+  ui.hide('inGameMenu')
   ui.elements.newButton1.addEventListener('click', () => {
     const gameConfig: GameConfig = {
       amount: 10,

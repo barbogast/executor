@@ -6,7 +6,8 @@ type Elements = {
   finishGameCode: HTMLElement
   showButton: HTMLElement
   newButton1: HTMLElement
-  header: HTMLElement
+  inGameMenu: HTMLElement
+}
 
 function getElement(className: string) {
   const el = document.getElementsByClassName(className)[0]
@@ -29,7 +30,7 @@ class UI {
       finishGameCode: getElement('finish-game-code'),
       newButton1: getElement('new1'),
       showButton: getElement('show'),
-      header: getElement('header'),
+      inGameMenu: getElement('in-game-menu'),
     }
     this._display = {}
   }
