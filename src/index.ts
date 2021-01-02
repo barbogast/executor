@@ -25,11 +25,105 @@ type GameConfig = {
   symbolGenerator: SymbolGenerator
 }
 
+type GameType = 'clearTheBoard' | 'memory' | 'speed'
+type Difficulty = 'easy' | 'middle' | 'hard'
+
+function getPredefinedGame(type: GameType, difficulty: Difficulty) {
+  const predefinedGames: {
+    [type in GameType]: { [difficulty in Difficulty]: GameConfig }
+  } = {
+    clearTheBoard: {
+      easy: {
+        amount: 5,
+        addNumberOnMisclick: false,
+        autoAddNumberInterval: 5,
+        hideNumbersAfter: 3,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+      middle: {
+        amount: 10,
+        addNumberOnMisclick: true,
+        autoAddNumberInterval: 4,
+        hideNumbersAfter: 4,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+      hard: {
+        amount: 20,
+        addNumberOnMisclick: true,
+        autoAddNumberInterval: 3,
+        hideNumbersAfter: 5,
+        hideAfterFirstClick: true,
+        symbolGenerator: new MixAsc(),
+      },
+    },
+
+    memory: {
+      easy: {
+        amount: 5,
+        addNumberOnMisclick: false,
+        autoAddNumberInterval: 0,
+        hideNumbersAfter: 3,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+      middle: {
+        amount: 10,
+        addNumberOnMisclick: false,
+        autoAddNumberInterval: 0,
+        hideNumbersAfter: 0,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+      hard: {
+        amount: 10,
+        addNumberOnMisclick: true,
+        autoAddNumberInterval: 5,
+        hideNumbersAfter: 5,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+    },
+
+    speed: {
+      easy: {
+        amount: 10,
+        addNumberOnMisclick: false,
+        autoAddNumberInterval: 0,
+        hideNumbersAfter: 0,
+        hideAfterFirstClick: false,
+        symbolGenerator: new NumericAsc(),
+      },
+      middle: {
+        amount: 20,
+        addNumberOnMisclick: false,
+        autoAddNumberInterval: 0,
+        hideNumbersAfter: 0,
+        hideAfterFirstClick: true,
+        symbolGenerator: new NumericDesc(20),
+      },
+      hard: {
+        amount: 20,
+        addNumberOnMisclick: true,
+        autoAddNumberInterval: 5,
+        hideNumbersAfter: 5,
+        hideAfterFirstClick: true,
+        symbolGenerator: new MixAsc(),
+      },
+    },
+  }
+
+  return predefinedGames[type][difficulty]
+}
+
 class Main {
   init() {
     ui.hide('inGameMenu')
     ui.hide('canvas')
-    ui.elements.newButton1.addEventListener('click', () => this.startGame())
+    ui.elements.newButton1.addEventListener('click', () =>
+      this.startPredefinedGame(),
+    )
     ui.elements.abort.addEventListener('click', () => {
       ui.show('newGameMenu')
       ui.hide('inGameMenu')
@@ -37,16 +131,14 @@ class Main {
     })
   }
 
-  startGame() {
-    const gameConfig: GameConfig = {
-      amount: 10,
-      addNumberOnMisclick: true,
-      autoAddNumberInterval: 5,
-      hideNumbersAfter: 0,
-      hideAfterFirstClick: true,
-      symbolGenerator: new NumericAsc(),
-    }
+  startPredefinedGame() {
+    const gameType = ui.elements.gameType.value as GameType
+    const difficulty = ui.elements.difficulty.value as Difficulty
 
+    this.startGame(getPredefinedGame(gameType, difficulty))
+  }
+
+  startGame(gameConfig: GameConfig) {
     timers.clearAll()
     const targets = new Targets()
     const board = new Board(targets)

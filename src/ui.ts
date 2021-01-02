@@ -8,6 +8,8 @@ type Elements = {
   newButton1: HTMLElement
   inGameMenu: HTMLElement
   abort: HTMLElement
+  difficulty: HTMLSelectElement
+  gameType: HTMLSelectElement
 }
 
 function getElement(className: string) {
@@ -33,6 +35,8 @@ class UI {
       showButton: getElement('show'),
       inGameMenu: getElement('in-game-menu'),
       abort: getElement('abort'),
+      difficulty: getElement('difficulty') as HTMLSelectElement,
+      gameType: getElement('game-type') as HTMLSelectElement,
     }
     this._display = {}
   }

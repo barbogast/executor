@@ -102,19 +102,20 @@
         <h3>Play game</h3>
         <div class="custom-game-input">
           <div class="custom-game-input-label">Type</div>
-          <select>
-            <option>Memory</option>
-            <option>Clear the board</option>
+          <select class="game-type">
+            <option value="memory">Memory</option>
+            <option value="speed">Speed</option>
+            <option value="clearTheBoard">Clear the board</option>
             <!-- <option>Color memory</option> -->
           </select>
         </div>
 
         <div class="custom-game-input">
           <div class="custom-game-input-label">Difficulty</div>
-          <select>
-            <option>Easy (letters)</option>
-            <option>Middle (letters desc)</option>
-            <option>Monkey (mix)</option>
+          <select class="difficulty">
+            <option value="easy">Easy (letters)</option>
+            <option value="middle">Middle (letters desc)</option>
+            <option value="hard">Monkey (mix)</option>
           </select>
         </div>
 
