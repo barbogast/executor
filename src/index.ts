@@ -49,17 +49,6 @@ type GameConfig = {
   symbolGenerator: SymbolGenerator
 }
 
-type Elements = {
-  canvasWrapper: HTMLElement
-  canvas: HTMLCanvasElement
-  newGameMenu: HTMLElement
-  finishGameMenu: HTMLElement
-  finishGameCode: HTMLElement
-  showButton: HTMLElement
-  newButton1: HTMLElement
-  header: HTMLElement
-}
-
 function main() {
   const ui = new UI()
 

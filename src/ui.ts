@@ -1,3 +1,14 @@
+type Elements = {
+  canvasWrapper: HTMLElement
+  canvas: HTMLCanvasElement
+  newGameMenu: HTMLElement
+  finishGameMenu: HTMLElement
+  finishGameCode: HTMLElement
+  showButton: HTMLElement
+  newButton1: HTMLElement
+  header: HTMLElement
+}
+
 class UI {
   elements: Elements
   _display: { [key: string]: string }
