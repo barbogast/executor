@@ -89,6 +89,9 @@ class Game {
         timers.clearAll()
       }
       this.board.draw()
+    } else {
+      this.addNumber()
+      this.board.draw()
     }
   }
 }
