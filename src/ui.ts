@@ -11,7 +11,7 @@ type Elements = {
 function getElement(className: string) {
   const el = document.getElementsByClassName(className)[0]
   if (!el) {
-    throw new Error('.${className} not found')
+    throw new Error(`.${className} not found`)
   }
   return el as HTMLElement
 }
@@ -35,8 +35,6 @@ class UI {
   }
 
   show(key: keyof Elements) {
-    console.log('hsow', this._display)
-
     this.elements[key].style.display = this._display[key] || 'block'
   }
 
