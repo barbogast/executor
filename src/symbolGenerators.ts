@@ -1,3 +1,15 @@
+function getAlphabet(limit: number) {
+  let a = ''
+  for (let i = 9; ++i < 36; ) {
+    a += i.toString(36)
+  }
+  return a.slice(0, limit).toUpperCase().split('')
+}
+
+function getRandomArbitrary(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min) + min)
+}
+
 interface SymbolGenerator {
   isLast(): boolean
   next(): string

@@ -1,3 +1,7 @@
+function getCurrentTimestamp() {
+  return new Date().getTime()
+}
+
 class Stats {
   start: number
   end: number
