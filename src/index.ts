@@ -26,21 +26,14 @@ type GameConfig = {
 }
 
 class Main {
-  ui: UI
-  constructor() {
-    this.ui = new UI()
-  }
-
   init() {
-    this.ui.hide('inGameMenu')
-    this.ui.hide('canvas')
-    this.ui.elements.newButton1.addEventListener('click', () =>
-      this.startGame(),
-    )
-    this.ui.elements.abort.addEventListener('click', () => {
-      this.ui.show('newGameMenu')
-      this.ui.hide('inGameMenu')
-      this.ui.hide('canvas')
+    ui.hide('inGameMenu')
+    ui.hide('canvas')
+    ui.elements.newButton1.addEventListener('click', () => this.startGame())
+    ui.elements.abort.addEventListener('click', () => {
+      ui.show('newGameMenu')
+      ui.hide('inGameMenu')
+      ui.hide('canvas')
     })
   }
 
@@ -56,10 +49,10 @@ class Main {
 
     timers.clearAll()
     const targets = new Targets()
-    const board = new Board(this.ui, targets)
-    const game = new Game(this.ui, board, targets, gameConfig)
+    const board = new Board(targets)
+    const game = new Game(board, targets, gameConfig)
 
     game.start()
-    this.ui.show('canvas')
+    ui.show('canvas')
   }
 }

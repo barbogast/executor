@@ -2,19 +2,17 @@ class Game {
   targets: Targets
   board: Board
   stats: Stats
-  ui: UI
   gameConfig: GameConfig
 
-  constructor(ui: UI, board: Board, targets: Targets, gameConfig: GameConfig) {
+  constructor(board: Board, targets: Targets, gameConfig: GameConfig) {
     this.stats = new Stats()
     this.board = board
-    this.ui = ui
     this.targets = targets
     this.gameConfig = gameConfig
   }
 
   start() {
-    this.ui.show('inGameMenu')
+    ui.show('inGameMenu')
     this.board.clear()
 
     COLORS.sort(() => 0.5 - Math.random())
@@ -28,8 +26,8 @@ class Game {
 
     this.board.registerOnClickHandler((circle) => this.onClick(circle))
 
-    this.ui.show('showButton')
-    this.ui.elements.showButton.addEventListener('click', () => {
+    ui.show('showButton')
+    ui.elements.showButton.addEventListener('click', () => {
       this.addNumber()
       this.board.setNumberVisibility(true, 0)
       this.board.setNumberVisibility(false, 2)
@@ -82,10 +80,10 @@ class Game {
       this.stats.foundNumber(target.text as string)
       if (this.targets.allTargetsReached()) {
         this.stats.finish()
-        this.ui.hide('canvasWrapper')
-        this.ui.show('finishGameMenu')
-        this.ui.hide('showButton')
-        this.ui.elements.finishGameCode.innerHTML = this.stats.print()
+        ui.hide('canvasWrapper')
+        ui.show('finishGameMenu')
+        ui.hide('showButton')
+        ui.elements.finishGameCode.innerHTML = this.stats.print()
         timers.clearAll()
       }
       this.board.draw()

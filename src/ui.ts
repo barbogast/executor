@@ -49,3 +49,5 @@ class UI {
     this.elements[key].style.display = 'none'
   }
 }
+
+const ui = new UI()

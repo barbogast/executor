@@ -4,17 +4,15 @@ class Board {
   numbersAreHidden: boolean
   sizeX: number
   sizeY: number
-  ui: UI
 
-  constructor(ui: UI, targets: Targets) {
+  constructor(targets: Targets) {
     this.targets = targets
-    this.ui = ui
     this.numbersAreHidden = false
 
     this.sizeX = 0
     this.sizeY = 0
 
-    const ctx = this.ui.elements.canvas.getContext('2d')
+    const ctx = ui.elements.canvas.getContext('2d')
     if (!ctx) {
       throw new Error('ctx is undefined')
     }
@@ -26,16 +24,16 @@ class Board {
   }
 
   registerOnClickHandler(callback: (circle: Circle | void) => void) {
-    this.ui.elements.canvas.addEventListener('click', (e) =>
+    ui.elements.canvas.addEventListener('click', (e) =>
       callback(this.targets.findTarget(e.offsetX, e.offsetY)),
     )
   }
 
   mouseMove(x: number, y: number) {
     if (this.targets.findTarget(x, y)) {
-      this.ui.elements.canvas.classList.add('pointer')
+      ui.elements.canvas.classList.add('pointer')
     } else {
-      this.ui.elements.canvas.classList.remove('pointer')
+      ui.elements.canvas.classList.remove('pointer')
     }
   }
 
@@ -85,17 +83,17 @@ class Board {
   }
 
   setup() {
-    this.ui.hide('newGameMenu')
-    this.ui.hide('finishGameMenu')
-    this.ui.show('canvasWrapper')
+    ui.hide('newGameMenu')
+    ui.hide('finishGameMenu')
+    ui.show('canvasWrapper')
 
-    this.sizeX = this.ui.elements.canvasWrapper.clientWidth
-    this.sizeY = this.ui.elements.canvasWrapper.clientHeight
+    this.sizeX = ui.elements.canvasWrapper.clientWidth
+    this.sizeY = ui.elements.canvasWrapper.clientHeight
 
-    this.ui.elements.canvas.width = this.sizeX
-    this.ui.elements.canvas.height = this.sizeY
+    ui.elements.canvas.width = this.sizeX
+    ui.elements.canvas.height = this.sizeY
 
-    this.ui.elements.canvas.addEventListener('mousemove', (e) =>
+    ui.elements.canvas.addEventListener('mousemove', (e) =>
       this.mouseMove(e.offsetX, e.offsetY),
     )
   }
