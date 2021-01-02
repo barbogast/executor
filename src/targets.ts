@@ -42,4 +42,19 @@ class Targets {
       target.draw(numbersAreHidden)
     }
   }
+
+  doesCollide(centerX: number, centerY: number) {
+    let doesCollide = false
+    this.forEach((x, y) => {
+      if (
+        !(centerX < x - DIST * 2 || centerX > x + DIST * 2) &&
+        !(centerY < y - DIST * 2 || centerY > y + DIST * 2)
+      ) {
+        doesCollide = true
+        return true
+      }
+    })
+
+    return doesCollide
+  }
 }

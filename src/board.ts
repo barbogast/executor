@@ -69,7 +69,7 @@ class Board {
         continue
       }
 
-      if (doesCollide(this.targets, centerX, centerY)) {
+      if (this.targets.doesCollide(centerX, centerY)) {
         continue
       }
 

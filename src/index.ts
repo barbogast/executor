@@ -49,21 +49,6 @@ type GameConfig = {
   symbolGenerator: SymbolGenerator
 }
 
-function doesCollide(targets: Targets, centerX: number, centerY: number) {
-  let doesCollide = false
-  targets.forEach((x, y) => {
-    if (
-      !(centerX < x - DIST * 2 || centerX > x + DIST * 2) &&
-      !(centerY < y - DIST * 2 || centerY > y + DIST * 2)
-    ) {
-      doesCollide = true
-      return true
-    }
-  })
-
-  return doesCollide
-}
-
 type Elements = {
   canvasWrapper: HTMLElement
   canvas: HTMLCanvasElement
