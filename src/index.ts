@@ -41,11 +41,20 @@ type GameConfig = {
   symbolGenerator: SymbolGenerator
 }
 
-function main() {
-  const ui = new UI()
+class Main {
+  ui: UI
+  constructor() {
+    this.ui = new UI()
+  }
 
-  ui.hide('inGameMenu')
-  ui.elements.newButton1.addEventListener('click', () => {
+  init() {
+    this.ui.hide('inGameMenu')
+    this.ui.elements.newButton1.addEventListener('click', () =>
+      this.startGame(),
+    )
+  }
+
+  startGame() {
     const gameConfig: GameConfig = {
       amount: 10,
       addNumberOnMisclick: true,
@@ -57,9 +66,9 @@ function main() {
 
     timers.clearAll()
     const targets = new Targets()
-    const board = new Board(ui, targets)
-    const game = new Game(ui, board, targets, gameConfig)
+    const board = new Board(this.ui, targets)
+    const game = new Game(this.ui, board, targets, gameConfig)
 
     game.start()
-  })
+  }
 }
