@@ -12,7 +12,6 @@ class Game {
   }
 
   start() {
-    ui.show('inGameMenu')
     this.board.clear()
 
     COLORS.sort(() => 0.5 - Math.random())
@@ -80,11 +79,9 @@ class Game {
       this.stats.foundNumber(target.text as string)
       if (this.targets.allTargetsReached()) {
         this.stats.finish()
-        ui.hide('canvasWrapper')
-        ui.show('finishGameMenu')
-        ui.hide('showButton')
         ui.elements.finishGameCode.innerHTML = this.stats.print()
         timers.clearAll()
+        ui.setScreen('finishGame')
       }
       this.board.draw()
     } else {

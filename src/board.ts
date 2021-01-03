@@ -83,10 +83,6 @@ class Board {
   }
 
   setup() {
-    ui.hide('newGameMenu')
-    ui.hide('finishGameMenu')
-    ui.show('canvasWrapper')
-
     this.sizeX = ui.elements.canvasWrapper.clientWidth
     this.sizeY = ui.elements.canvasWrapper.clientHeight
 

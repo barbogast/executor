@@ -119,15 +119,12 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 
 class Main {
   init() {
-    ui.hide('inGameMenu')
-    ui.hide('canvas')
+    ui.setScreen('newGame')
     ui.elements.newButton1.addEventListener('click', () =>
       this.startPredefinedGame(),
     )
     ui.elements.abort.addEventListener('click', () => {
-      ui.show('newGameMenu')
-      ui.hide('inGameMenu')
-      ui.hide('canvas')
+      ui.setScreen('newGame')
     })
   }
 
@@ -140,11 +137,11 @@ class Main {
 
   startGame(gameConfig: GameConfig) {
     timers.clearAll()
+    ui.setScreen('game')
     const targets = new Targets()
     const board = new Board(targets)
     const game = new Game(board, targets, gameConfig)
 
     game.start()
-    ui.show('canvas')
   }
 }

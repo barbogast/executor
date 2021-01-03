@@ -12,11 +12,7 @@
   </head>
   <body onload="new Main().init()">
     <div class="main-container">
-      <div class="in-game-menu">
-        <button class="abort">Quit game</button>
-        <button class="show">Show</button>
-      </div>
-      <div class="new-game-menu">
+      <div class="new-game-screen screen">
         <h1>Executor</h1>
         <h3>Play game</h3>
         <div class="custom-game-input">
@@ -69,15 +65,20 @@
         <h3>Know Thyself</h3>
         <button class="new2">Start Test Session</button>
       </div>
-      <div class="game-container">
+
+      <div class="game-screen screen">
+        <div class="in-game-menu">
+          <button class="abort">Quit game</button>
+          <button class="show">Show</button>
+        </div>
         <div class="canvas-wrapper">
           <canvas class="canvas"></canvas>
         </div>
+      </div>
 
-        <div class="finish-game-menu">
-          Congrats
-          <code class="finish-game-code"></code>
-        </div>
+      <div class="finish-game-screen screen">
+        Congrats
+        <code class="finish-game-code"></code>
       </div>
     </div>
     <script type="text/javascript" src="./index.js"></script>

@@ -1,15 +1,18 @@
 type Elements = {
   canvasWrapper: HTMLElement
   canvas: HTMLCanvasElement
-  newGameMenu: HTMLElement
-  finishGameMenu: HTMLElement
   finishGameCode: HTMLElement
   showButton: HTMLElement
   newButton1: HTMLElement
-  inGameMenu: HTMLElement
   abort: HTMLElement
   difficulty: HTMLSelectElement
   gameType: HTMLSelectElement
+}
+
+type Screens = {
+  newGame: HTMLElement
+  finishGame: HTMLElement
+  game: HTMLElement
 }
 
 function getElement(className: string) {
@@ -22,23 +25,34 @@ function getElement(className: string) {
 
 class UI {
   elements: Elements
+  screens: Screens
   _display: { [key: string]: string }
 
   constructor() {
     this.elements = {
       canvasWrapper: getElement('canvas-wrapper'),
       canvas: getElement('canvas') as HTMLCanvasElement,
-      newGameMenu: getElement('new-game-menu'),
-      finishGameMenu: getElement('finish-game-menu'),
       finishGameCode: getElement('finish-game-code'),
       newButton1: getElement('new1'),
       showButton: getElement('show'),
-      inGameMenu: getElement('in-game-menu'),
       abort: getElement('abort'),
       difficulty: getElement('difficulty') as HTMLSelectElement,
       gameType: getElement('game-type') as HTMLSelectElement,
     }
+
+    this.screens = {
+      newGame: getElement('new-game-screen'),
+      finishGame: getElement('finish-game-screen'),
+      game: getElement('game-screen'),
+    }
+
     this._display = {}
+  }
+
+  setScreen(screenName: keyof Screens) {
+    Object.entries(this.screens).forEach(([name, el]) => {
+      el.style.display = name === screenName ? 'Flex' : 'none'
+    })
   }
 
   show(key: keyof Elements) {
