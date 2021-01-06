@@ -144,6 +144,7 @@ class Main {
       this.startPredefinedGame(),
     )
     ui.elements.abort.addEventListener('click', () => {
+      timers.clearAll()
       ui.setScreen('newGame')
     })
   }
