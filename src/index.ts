@@ -17,12 +17,12 @@ const COLORS = [
 ]
 
 type GameConfig = {
+  symbolGenerator: SymbolGenerator
   amount: number
   addNumberOnMisclick?: boolean
   autoAddNumberInterval?: number
   hideNumbersAfter?: number
   hideAfterFirstClick?: boolean
-  symbolGenerator: SymbolGenerator
 }
 
 type GameType = 'clearTheBoard' | 'memory' | 'speed'
