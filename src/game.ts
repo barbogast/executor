@@ -25,7 +25,10 @@ class Game {
 
     this.board.registerOnClickHandler((circle) => this.onClick(circle))
 
-    ui.show('showButton')
+    if (this.gameConfig.enableShowButton) {
+      ui.show('showButton')
+    }
+
     ui.elements.showButton.addEventListener('click', () => {
       this.addNumber()
       this.board.setNumberVisibility(true, 0)
