@@ -97,20 +97,16 @@ class Game {
   }
 
   onClick(target: Circle | void) {
-    this.stats.click()
     if (this.gameConfig.hideAfterFirstClick) {
       this.board.setNumberVisibility(false, 0)
     }
 
     if (!target) {
       // Click missed the targets
-      if (this.gameConfig.addNumberOnMisclick) {
-        this.addNumber()
-        this.board.draw()
-      }
       return
     }
 
+    this.stats.click()
     const targetIsCurrent = this.targets.tapTarget(target)
     if (targetIsCurrent) {
       // Click hit correct target
