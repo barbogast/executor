@@ -102,12 +102,14 @@ class Circle {
     }
 }
 class Game {
-    constructor(board, targets, gameConfig) {
+    constructor(board, targets, gameConfig, onFinish) {
         this.stats = new Stats();
         this.board = board;
         this.targets = targets;
         this.gameConfig = gameConfig;
         this._autoAddNumberTimer = () => { };
+        this.lives = gameConfig.lives || 0;
+        this.onFinish = onFinish;
     }
     start() {
         this.board.clear();
@@ -129,6 +131,10 @@ class Game {
         if (this.gameConfig.hideNumbersAfter) {
             this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter);
         }
+        if (this.gameConfig.lives) {
+            ui.show('lives');
+            this.updateLives();
+        }
         this.resetAutoAddNumberTimer();
     }
     addNumber() {
@@ -148,28 +154,28 @@ class Game {
             }, this.gameConfig.autoAddNumberInterval * 1000);
         }
     }
+    updateLives() {
+        ui.elements.livesValue.innerHTML = String(this.lives);
+    }
+    finishGame() {
+        this.stats.finish();
+        this.onFinish(this.stats);
+    }
     onClick(target) {
-        this.stats.click();
         if (this.gameConfig.hideAfterFirstClick) {
             this.board.setNumberVisibility(false, 0);
         }
         if (!target) {
             // Click missed the targets
-            if (this.gameConfig.addNumberOnMisclick) {
-                this.addNumber();
-                this.board.draw();
-            }
             return;
         }
+        this.stats.click();
         const targetIsCurrent = this.targets.tapTarget(target);
         if (targetIsCurrent) {
             // Click hit correct target
             this.stats.foundNumber(target.text);
             if (this.targets.allTargetsReached()) {
-                this.stats.finish();
-                ui.elements.finishGameCode.innerHTML = this.stats.print();
-                timers.clearAll();
-                ui.setScreen('finishGame');
+                this.finishGame();
             }
             else if (this.gameConfig.addNumberOnTargetHit) {
                 this.addNumber();
@@ -179,6 +185,16 @@ class Game {
         else {
             // Click hit wrong target
             this.resetAutoAddNumberTimer();
+            if (this.gameConfig.lives) {
+                if (this.lives === 0) {
+                    this.finishGame();
+                    return;
+                }
+                else {
+                    this.lives -= 1;
+                    this.updateLives();
+                }
+            }
             if (this.gameConfig.addNumberOnMisclick) {
                 this.addNumber();
                 this.board.draw();
@@ -265,6 +281,7 @@ function getPredefinedGame(type, difficulty) {
                 hideNumbersAfter: 3,
                 showNumbersOnMisclick: 2,
                 symbolGenerator: new NumericAsc(),
+                lives: 5,
             },
             middle: {
                 amount: 4,
@@ -272,6 +289,7 @@ function getPredefinedGame(type, difficulty) {
                 hideNumbersAfter: 2,
                 showNumbersOnMisclick: 1,
                 symbolGenerator: new NumericAsc(),
+                lives: 3,
             },
             hard: {
                 amount: 3,
@@ -279,26 +297,21 @@ function getPredefinedGame(type, difficulty) {
                 hideNumbersAfter: 1,
                 enableShowButton: true,
                 autoAddNumberInterval: 10,
+                lives: 2,
                 symbolGenerator: new NumericAsc(),
             },
         },
         speed: {
             easy: {
                 amount: 10,
-                hideAfterFirstClick: false,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
                 amount: 20,
-                hideAfterFirstClick: true,
                 symbolGenerator: new NumericDesc(20),
             },
             hard: {
                 amount: 20,
-                addNumberOnMisclick: true,
-                autoAddNumberInterval: 5,
-                hideNumbersAfter: 5,
-                hideAfterFirstClick: true,
                 symbolGenerator: new MixAsc(),
             },
         },
@@ -308,15 +321,27 @@ function getPredefinedGame(type, difficulty) {
 class Main {
     init() {
         ui.setScreen('newGame');
-        ui.elements.newButton1.addEventListener('click', () => this.startPredefinedGame());
         ui.elements.abort.addEventListener('click', () => {
+            timers.clearAll();
             ui.setScreen('newGame');
         });
+        ui.screens.newGame.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.tagName === 'BUTTON') {
+                const gameType = target.dataset.type;
+                const difficulty = target.dataset.difficulty;
+                this.startGame(getPredefinedGame(gameType, difficulty));
+            }
+        });
     }
-    startPredefinedGame() {
-        const gameType = ui.elements.gameType.value;
-        const difficulty = ui.elements.difficulty.value;
-        this.startGame(getPredefinedGame(gameType, difficulty));
+    endGame(stats) {
+        ui.elements.finishGameCode.innerHTML = stats.print();
+        timers.clearAll();
+        ui.setScreen('finishGame');
+        ui.elements.newGame.addEventListener('click', () => {
+            timers.clearAll();
+            ui.setScreen('newGame');
+        });
     }
     startGame(gameConfig) {
         if (window.innerWidth < 1000) {
@@ -326,7 +351,7 @@ class Main {
         ui.setScreen('game');
         const targets = new Targets();
         const board = new Board(targets);
-        const game = new Game(board, targets, gameConfig);
+        const game = new Game(board, targets, gameConfig, (stats) => this.endGame(stats));
         game.start();
     }
 }
@@ -358,12 +383,12 @@ class Stats {
     print() {
         let res = '';
         res += `
-  Total duraction: ${(this.end - this.start) / 1000} sec
-  Misclicks: ${this.clicks - this.correctClicks}
-  
-  `;
+Total duraction: ${(this.end - this.start) / 1000} sec
+Misclicks: ${this.clicks - this.correctClicks}
+
+`;
         for (const int of this.intervals) {
-            res += `${int.number}: ${int.duration / 1000} sec\n`;
+            res += `${int.number}: ${(int.duration / 1000).toFixed(1)} sec\n`;
         }
         const opts = {
             height: 6,
@@ -371,12 +396,6 @@ class Stats {
                 return (x / 1000).toFixed(2);
             },
         };
-        // console.log(
-        //   asciichart.plot(
-        //     this.intervals.map((x) => x.duration),
-        //     opts,
-        //   ),
-        // )
         return res;
     }
 }
@@ -579,11 +598,11 @@ class UI {
             canvasWrapper: getElement('canvas-wrapper'),
             canvas: getElement('canvas'),
             finishGameCode: getElement('finish-game-code'),
-            newButton1: getElement('new1'),
             showButton: getElement('show'),
             abort: getElement('abort'),
-            difficulty: getElement('difficulty'),
-            gameType: getElement('game-type'),
+            lives: getElement('lives'),
+            livesValue: getElement('lives-value'),
+            newGame: getElement('new-game'),
         };
         this.screens = {
             newGame: getElement('new-game-screen'),
