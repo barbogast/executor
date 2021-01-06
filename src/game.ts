@@ -38,15 +38,15 @@ class Game {
 
     this.board.registerOnClickHandler((circle) => this.onClick(circle))
 
-    if (this.gameConfig.enableShowButton) {
+    const enableShowButton = this.gameConfig.enableShowButton
+    if (enableShowButton) {
+      ui.elements.showButton.addEventListener('click', () => {
+        this.addNumber()
+        this.board.setNumberVisibility(true, 0)
+        this.board.setNumberVisibility(false, enableShowButton)
+      })
       ui.show('showButton')
     }
-
-    ui.elements.showButton.addEventListener('click', () => {
-      this.addNumber()
-      this.board.setNumberVisibility(true, 0)
-      this.board.setNumberVisibility(false, 2)
-    })
 
     if (this.gameConfig.hideNumbersAfter) {
       this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter)

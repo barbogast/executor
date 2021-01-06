@@ -25,7 +25,7 @@ type GameConfig = {
   hideNumbersAfter?: number
   hideAfterFirstClick?: boolean
   showNumbersOnMisclick?: number
-  enableShowButton?: boolean
+  enableShowButton?: number
   lives?: number
 }
 
@@ -42,7 +42,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         autoAddNumberInterval: 5,
         hideNumbersAfter: 3,
         hideAfterFirstClick: true,
-        enableShowButton: true,
+        enableShowButton: 3,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
@@ -51,7 +51,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         autoAddNumberInterval: 4,
         hideNumbersAfter: 4,
         hideAfterFirstClick: true,
-        enableShowButton: true,
+        enableShowButton: 3,
         symbolGenerator: new NumericAsc(),
       },
       hard: {
@@ -60,7 +60,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         autoAddNumberInterval: 3,
         hideNumbersAfter: 5,
         hideAfterFirstClick: true,
-        enableShowButton: true,
+        enableShowButton: 3,
         symbolGenerator: new MixAsc(),
       },
     },
