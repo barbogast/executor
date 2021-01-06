@@ -66,7 +66,9 @@ class Game {
     if (this.gameConfig.hideAfterFirstClick) {
       this.board.setNumberVisibility(false, 0)
     }
+
     if (!target) {
+      // Click missed the targets
       if (this.gameConfig.addNumberOnMisclick) {
         this.addNumber()
         this.board.draw()
@@ -76,6 +78,7 @@ class Game {
 
     const targetIsCurrent = this.targets.tapTarget(target)
     if (targetIsCurrent) {
+      // Click hit correct target
       this.stats.foundNumber(target.text as string)
       if (this.targets.allTargetsReached()) {
         this.stats.finish()
@@ -85,6 +88,7 @@ class Game {
       }
       this.board.draw()
     } else {
+      // Click hit wrong target
       if (this.gameConfig.addNumberOnMisclick) {
         this.addNumber()
         this.board.draw()
