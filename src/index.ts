@@ -136,6 +136,9 @@ class Main {
   }
 
   startGame(gameConfig: GameConfig) {
+    if (window.innerWidth < 1000) {
+      document.documentElement.requestFullscreen()
+    }
     timers.clearAll()
     ui.setScreen('game')
     const targets = new Targets()
