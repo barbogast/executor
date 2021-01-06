@@ -18,10 +18,10 @@ const COLORS = [
 
 type GameConfig = {
   amount: number
-  addNumberOnMisclick: boolean
-  autoAddNumberInterval: number
-  hideNumbersAfter: number
-  hideAfterFirstClick: boolean
+  addNumberOnMisclick?: boolean
+  autoAddNumberInterval?: number
+  hideNumbersAfter?: number
+  hideAfterFirstClick?: boolean
   symbolGenerator: SymbolGenerator
 }
 
@@ -35,7 +35,6 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     clearTheBoard: {
       easy: {
         amount: 5,
-        addNumberOnMisclick: false,
         autoAddNumberInterval: 5,
         hideNumbersAfter: 3,
         hideAfterFirstClick: true,
@@ -62,8 +61,6 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     memory: {
       easy: {
         amount: 5,
-        addNumberOnMisclick: false,
-        autoAddNumberInterval: 0,
         hideNumbersAfter: 3,
         hideAfterFirstClick: true,
         symbolGenerator: new NumericAsc(),
@@ -71,8 +68,6 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
       middle: {
         amount: 10,
         addNumberOnMisclick: false,
-        autoAddNumberInterval: 0,
-        hideNumbersAfter: 0,
         hideAfterFirstClick: true,
         symbolGenerator: new NumericAsc(),
       },
@@ -89,17 +84,11 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     speed: {
       easy: {
         amount: 10,
-        addNumberOnMisclick: false,
-        autoAddNumberInterval: 0,
-        hideNumbersAfter: 0,
         hideAfterFirstClick: false,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
         amount: 20,
-        addNumberOnMisclick: false,
-        autoAddNumberInterval: 0,
-        hideNumbersAfter: 0,
         hideAfterFirstClick: true,
         symbolGenerator: new NumericDesc(20),
       },
