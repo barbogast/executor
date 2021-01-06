@@ -3,10 +3,10 @@ type Elements = {
   canvas: HTMLCanvasElement
   finishGameCode: HTMLElement
   showButton: HTMLElement
-  newButton1: HTMLElement
   abort: HTMLElement
-  difficulty: HTMLSelectElement
-  gameType: HTMLSelectElement
+  lives: HTMLElement
+  livesValue: HTMLElement
+  newGame: HTMLElement
 }
 
 type Screens = {
@@ -33,11 +33,11 @@ class UI {
       canvasWrapper: getElement('canvas-wrapper'),
       canvas: getElement('canvas') as HTMLCanvasElement,
       finishGameCode: getElement('finish-game-code'),
-      newButton1: getElement('new1'),
       showButton: getElement('show'),
       abort: getElement('abort'),
-      difficulty: getElement('difficulty') as HTMLSelectElement,
-      gameType: getElement('game-type') as HTMLSelectElement,
+      lives: getElement('lives') as HTMLElement,
+      livesValue: getElement('lives-value') as HTMLElement,
+      newGame: getElement('new-game') as HTMLElement,
     }
 
     this.screens = {

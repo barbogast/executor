@@ -39,13 +39,13 @@ class Stats {
     let res = ''
 
     res += `
-  Total duraction: ${(this!.end - this.start) / 1000} sec
-  Misclicks: ${this.clicks - this.correctClicks}
-  
-  `
+Total duraction: ${(this!.end - this.start) / 1000} sec
+Misclicks: ${this.clicks - this.correctClicks}
+
+`
 
     for (const int of this.intervals) {
-      res += `${int.number}: ${int.duration / 1000} sec\n`
+      res += `${int.number}: ${(int.duration / 1000).toFixed(1)} sec\n`
     }
 
     const opts = {
@@ -54,12 +54,7 @@ class Stats {
         return (x / 1000).toFixed(2)
       },
     }
-    // console.log(
-    //   asciichart.plot(
-    //     this.intervals.map((x) => x.duration),
-    //     opts,
-    //   ),
-    // )
+
     return res
   }
 }

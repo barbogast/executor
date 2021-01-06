@@ -1,16 +1,27 @@
+type OnFinish = (stats: Stats) => void
+
 class Game {
   targets: Targets
   board: Board
   stats: Stats
   gameConfig: GameConfig
   _autoAddNumberTimer: () => void
+  onFinish: OnFinish
+  lives: number
 
-  constructor(board: Board, targets: Targets, gameConfig: GameConfig) {
+  constructor(
+    board: Board,
+    targets: Targets,
+    gameConfig: GameConfig,
+    onFinish: OnFinish,
+  ) {
     this.stats = new Stats()
     this.board = board
     this.targets = targets
     this.gameConfig = gameConfig
     this._autoAddNumberTimer = () => {}
+    this.lives = gameConfig.lives || 0
+    this.onFinish = onFinish
   }
 
   start() {
@@ -39,6 +50,11 @@ class Game {
 
     if (this.gameConfig.hideNumbersAfter) {
       this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter)
+    }
+
+    if (this.gameConfig.lives) {
+      ui.show('lives')
+      this.updateLives()
     }
 
     this.resetAutoAddNumberTimer()
@@ -71,31 +87,33 @@ class Game {
     }
   }
 
+  updateLives() {
+    ui.elements.livesValue.innerHTML = String(this.lives)
+  }
+
+  finishGame() {
+    this.stats.finish()
+    this.onFinish(this.stats)
+  }
+
   onClick(target: Circle | void) {
-    this.stats.click()
     if (this.gameConfig.hideAfterFirstClick) {
       this.board.setNumberVisibility(false, 0)
     }
 
     if (!target) {
       // Click missed the targets
-      if (this.gameConfig.addNumberOnMisclick) {
-        this.addNumber()
-        this.board.draw()
-      }
       return
     }
 
+    this.stats.click()
     const targetIsCurrent = this.targets.tapTarget(target)
     if (targetIsCurrent) {
       // Click hit correct target
       this.stats.foundNumber(target.text as string)
 
       if (this.targets.allTargetsReached()) {
-        this.stats.finish()
-        ui.elements.finishGameCode.innerHTML = this.stats.print()
-        timers.clearAll()
-        ui.setScreen('finishGame')
+        this.finishGame()
       } else if (this.gameConfig.addNumberOnTargetHit) {
         this.addNumber()
       }
@@ -103,6 +121,17 @@ class Game {
     } else {
       // Click hit wrong target
       this.resetAutoAddNumberTimer()
+
+      if (this.gameConfig.lives) {
+        if (this.lives === 0) {
+          this.finishGame()
+          return
+        } else {
+          this.lives -= 1
+          this.updateLives()
+        }
+      }
+
       if (this.gameConfig.addNumberOnMisclick) {
         this.addNumber()
         this.board.draw()

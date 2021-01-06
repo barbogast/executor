@@ -17,13 +17,16 @@ body {
   display: flex;
 }
 
+h3 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
 .main-container {
   padding: 20px;
-  background-color: black;
   flex: 1;
   display: flex;
   flex-direction: column;
-  color: white;
 }
 
 .screen {
@@ -32,12 +35,27 @@ body {
   flex: 1;
 }
 
+.button-row {
+  display: flex;
+  direction: row;
+  margin: 10px 0;
+  justify-content: space-between;
+}
+
+.button-row > button {
+  width: 70px;
+}
+
 .canvas-wrapper {
   flex: 1;
 }
 
 .finish-game-screen {
   white-space: pre;
+}
+
+.new-game-screen {
+  justify-content: space-between;
 }
 
 .finish-game-code {
@@ -51,8 +69,14 @@ body {
   flex-direction: row;
 }
 
-.show {
+.show,
+.lives {
   display: none;
+}
+
+.show,
+.abort {
+  margin: 0 10px;
 }
 
 .custom-game-input {

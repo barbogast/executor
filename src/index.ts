@@ -26,6 +26,7 @@ type GameConfig = {
   hideAfterFirstClick?: boolean
   showNumbersOnMisclick?: number
   enableShowButton?: boolean
+  lives?: number
 }
 
 type GameType = 'clearTheBoard' | 'memory' | 'speed' | 'invisibleNumbers'
@@ -94,6 +95,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         hideNumbersAfter: 3,
         showNumbersOnMisclick: 2,
         symbolGenerator: new NumericAsc(),
+        lives: 5,
       },
       middle: {
         amount: 4,
@@ -101,6 +103,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         hideNumbersAfter: 2,
         showNumbersOnMisclick: 1,
         symbolGenerator: new NumericAsc(),
+        lives: 3,
       },
       hard: {
         amount: 3,
@@ -108,6 +111,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         hideNumbersAfter: 1,
         enableShowButton: true,
         autoAddNumberInterval: 10,
+        lives: 2,
         symbolGenerator: new NumericAsc(),
       },
     },
@@ -115,20 +119,14 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     speed: {
       easy: {
         amount: 10,
-        hideAfterFirstClick: false,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
         amount: 20,
-        hideAfterFirstClick: true,
         symbolGenerator: new NumericDesc(20),
       },
       hard: {
         amount: 20,
-        addNumberOnMisclick: true,
-        autoAddNumberInterval: 5,
-        hideNumbersAfter: 5,
-        hideAfterFirstClick: true,
         symbolGenerator: new MixAsc(),
       },
     },
@@ -140,19 +138,30 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 class Main {
   init() {
     ui.setScreen('newGame')
-    ui.elements.newButton1.addEventListener('click', () =>
-      this.startPredefinedGame(),
-    )
+
     ui.elements.abort.addEventListener('click', () => {
+      timers.clearAll()
       ui.setScreen('newGame')
+    })
+
+    ui.screens.newGame.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'BUTTON') {
+        const gameType = target.dataset.type as GameType
+        const difficulty = target.dataset.difficulty as Difficulty
+        this.startGame(getPredefinedGame(gameType, difficulty))
+      }
     })
   }
 
-  startPredefinedGame() {
-    const gameType = ui.elements.gameType.value as GameType
-    const difficulty = ui.elements.difficulty.value as Difficulty
-
-    this.startGame(getPredefinedGame(gameType, difficulty))
+  endGame(stats: Stats) {
+    ui.elements.finishGameCode.innerHTML = stats.print()
+    timers.clearAll()
+    ui.setScreen('finishGame')
+    ui.elements.newGame.addEventListener('click', () => {
+      timers.clearAll()
+      ui.setScreen('newGame')
+    })
   }
 
   startGame(gameConfig: GameConfig) {
@@ -163,7 +172,9 @@ class Main {
     ui.setScreen('game')
     const targets = new Targets()
     const board = new Board(targets)
-    const game = new Game(board, targets, gameConfig)
+    const game = new Game(board, targets, gameConfig, (stats) =>
+      this.endGame(stats),
+    )
 
     game.start()
   }
