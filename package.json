@@ -6,6 +6,7 @@
   "scripts": {
     "tsc": "tsc",
     "serve": "(cd public && python -m SimpleHTTPServer 8080)",
+    "copy-to-docs": "yarn tsc && cp -r public docs",
     "watch": "tsc --watch"
   },
   "author": "",
