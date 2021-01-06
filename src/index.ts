@@ -20,6 +20,7 @@ type GameConfig = {
   symbolGenerator: SymbolGenerator
   amount: number
   addNumberOnMisclick?: boolean
+  addNumberOnTargetHit?: boolean
   autoAddNumberInterval?: number
   hideNumbersAfter?: number
   hideAfterFirstClick?: boolean

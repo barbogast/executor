@@ -80,11 +80,14 @@ class Game {
     if (targetIsCurrent) {
       // Click hit correct target
       this.stats.foundNumber(target.text as string)
+
       if (this.targets.allTargetsReached()) {
         this.stats.finish()
         ui.elements.finishGameCode.innerHTML = this.stats.print()
         timers.clearAll()
         ui.setScreen('finishGame')
+      } else if (this.gameConfig.addNumberOnTargetHit) {
+        this.addNumber()
       }
       this.board.draw()
     } else {
