@@ -9,6 +9,7 @@ type Elements = {
   gameType: HTMLSelectElement
   lives: HTMLElement
   livesValue: HTMLElement
+  newGame: HTMLElement
 }
 
 type Screens = {
@@ -42,6 +43,7 @@ class UI {
       gameType: getElement('game-type') as HTMLSelectElement,
       lives: getElement('lives') as HTMLElement,
       livesValue: getElement('lives-value') as HTMLElement,
+      newGame: getElement('new-game') as HTMLElement,
     }
 
     this.screens = {

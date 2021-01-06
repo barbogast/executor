@@ -1,18 +1,27 @@
+type OnFinish = (stats: Stats) => void
+
 class Game {
   targets: Targets
   board: Board
   stats: Stats
   gameConfig: GameConfig
   _autoAddNumberTimer: () => void
+  onFinish: OnFinish
   lives: number
 
-  constructor(board: Board, targets: Targets, gameConfig: GameConfig) {
+  constructor(
+    board: Board,
+    targets: Targets,
+    gameConfig: GameConfig,
+    onFinish: OnFinish,
+  ) {
     this.stats = new Stats()
     this.board = board
     this.targets = targets
     this.gameConfig = gameConfig
     this._autoAddNumberTimer = () => {}
     this.lives = gameConfig.lives || 0
+    this.onFinish = onFinish
   }
 
   start() {
@@ -84,9 +93,7 @@ class Game {
 
   finishGame() {
     this.stats.finish()
-    ui.elements.finishGameCode.innerHTML = this.stats.print()
-    timers.clearAll()
-    ui.setScreen('finishGame')
+    this.onFinish(this.stats)
   }
 
   onClick(target: Circle | void) {

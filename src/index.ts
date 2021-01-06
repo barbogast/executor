@@ -160,6 +160,16 @@ class Main {
     this.startGame(getPredefinedGame(gameType, difficulty))
   }
 
+  endGame(stats: Stats) {
+    ui.elements.finishGameCode.innerHTML = stats.print()
+    timers.clearAll()
+    ui.setScreen('finishGame')
+    ui.elements.newGame.addEventListener('click', () => {
+      timers.clearAll()
+      ui.setScreen('newGame')
+    })
+  }
+
   startGame(gameConfig: GameConfig) {
     if (window.innerWidth < 1000) {
       document.documentElement.requestFullscreen()
@@ -168,7 +178,9 @@ class Main {
     ui.setScreen('game')
     const targets = new Targets()
     const board = new Board(targets)
-    const game = new Game(board, targets, gameConfig)
+    const game = new Game(board, targets, gameConfig, (stats) =>
+      this.endGame(stats),
+    )
 
     game.start()
   }
