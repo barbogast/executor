@@ -28,7 +28,7 @@ type GameConfig = {
   enableShowButton?: boolean
 }
 
-type GameType = 'clearTheBoard' | 'memory' | 'speed'
+type GameType = 'clearTheBoard' | 'memory' | 'speed' | 'invisibleNumbers'
 type Difficulty = 'easy' | 'middle' | 'hard'
 
 function getPredefinedGame(type: GameType, difficulty: Difficulty) {
@@ -83,6 +83,31 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         autoAddNumberInterval: 5,
         hideNumbersAfter: 5,
         hideAfterFirstClick: true,
+        symbolGenerator: new NumericAsc(),
+      },
+    },
+
+    invisibleNumbers: {
+      easy: {
+        amount: 3,
+        addNumberOnTargetHit: true,
+        hideNumbersAfter: 3,
+        showNumbersOnMisclick: 2,
+        symbolGenerator: new NumericAsc(),
+      },
+      middle: {
+        amount: 4,
+        addNumberOnTargetHit: true,
+        hideNumbersAfter: 2,
+        showNumbersOnMisclick: 1,
+        symbolGenerator: new NumericAsc(),
+      },
+      hard: {
+        amount: 3,
+        addNumberOnTargetHit: true,
+        hideNumbersAfter: 1,
+        enableShowButton: true,
+        autoAddNumberInterval: 10,
         symbolGenerator: new NumericAsc(),
       },
     },
