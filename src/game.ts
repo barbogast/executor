@@ -3,12 +3,14 @@ class Game {
   board: Board
   stats: Stats
   gameConfig: GameConfig
+  _autoAddNumberTimer: () => void
 
   constructor(board: Board, targets: Targets, gameConfig: GameConfig) {
     this.stats = new Stats()
     this.board = board
     this.targets = targets
     this.gameConfig = gameConfig
+    this._autoAddNumberTimer = () => {}
   }
 
   start() {
@@ -39,12 +41,7 @@ class Game {
       this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter)
     }
 
-    if (this.gameConfig.autoAddNumberInterval) {
-      timers.setInterval(() => {
-        this.addNumber()
-        this.board.draw()
-      }, this.gameConfig.autoAddNumberInterval * 1000)
-    }
+    this.resetAutoAddNumberTimer()
   }
 
   addNumber() {
@@ -62,6 +59,16 @@ class Game {
         this.gameConfig.symbolGenerator.getColor(),
       ),
     )
+  }
+
+  resetAutoAddNumberTimer() {
+    if (this.gameConfig.autoAddNumberInterval) {
+      this._autoAddNumberTimer()
+      this._autoAddNumberTimer = timers.setInterval(() => {
+        this.addNumber()
+        this.board.draw()
+      }, this.gameConfig.autoAddNumberInterval * 1000)
+    }
   }
 
   onClick(target: Circle | void) {
@@ -95,6 +102,7 @@ class Game {
       this.board.draw()
     } else {
       // Click hit wrong target
+      this.resetAutoAddNumberTimer()
       if (this.gameConfig.addNumberOnMisclick) {
         this.addNumber()
         this.board.draw()
