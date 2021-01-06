@@ -7,6 +7,8 @@ type Elements = {
   abort: HTMLElement
   difficulty: HTMLSelectElement
   gameType: HTMLSelectElement
+  lives: HTMLElement
+  livesValue: HTMLElement
 }
 
 type Screens = {
@@ -38,6 +40,8 @@ class UI {
       abort: getElement('abort'),
       difficulty: getElement('difficulty') as HTMLSelectElement,
       gameType: getElement('game-type') as HTMLSelectElement,
+      lives: getElement('lives') as HTMLElement,
+      livesValue: getElement('lives-value') as HTMLElement,
     }
 
     this.screens = {

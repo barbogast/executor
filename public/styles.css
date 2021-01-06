@@ -51,8 +51,14 @@ body {
   flex-direction: row;
 }
 
-.show {
+.show,
+.lives {
   display: none;
+}
+
+.show,
+.abort {
+  margin: 0 10px;
 }
 
 .custom-game-input {
