@@ -99,6 +99,14 @@ class Game {
         this.addNumber()
         this.board.draw()
       }
+
+      if (this.gameConfig.showNumbersOnMisclick) {
+        this.board.setNumberVisibility(true, 0)
+        this.board.setNumberVisibility(
+          false,
+          this.gameConfig.showNumbersOnMisclick,
+        )
+      }
     }
   }
 }

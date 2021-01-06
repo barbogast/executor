@@ -24,6 +24,7 @@ type GameConfig = {
   autoAddNumberInterval?: number
   hideNumbersAfter?: number
   hideAfterFirstClick?: boolean
+  showNumbersOnMisclick?: number
   enableShowButton?: boolean
 }
 
