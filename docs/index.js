@@ -107,6 +107,7 @@ class Game {
         this.board = board;
         this.targets = targets;
         this.gameConfig = gameConfig;
+        this._autoAddNumberTimer = () => { };
     }
     start() {
         this.board.clear();
@@ -117,7 +118,9 @@ class Game {
         }
         this.board.draw();
         this.board.registerOnClickHandler((circle) => this.onClick(circle));
-        ui.show('showButton');
+        if (this.gameConfig.enableShowButton) {
+            ui.show('showButton');
+        }
         ui.elements.showButton.addEventListener('click', () => {
             this.addNumber();
             this.board.setNumberVisibility(true, 0);
@@ -126,12 +129,7 @@ class Game {
         if (this.gameConfig.hideNumbersAfter) {
             this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter);
         }
-        if (this.gameConfig.autoAddNumberInterval) {
-            timers.setInterval(() => {
-                this.addNumber();
-                this.board.draw();
-            }, this.gameConfig.autoAddNumberInterval * 1000);
-        }
+        this.resetAutoAddNumberTimer();
     }
     addNumber() {
         const [centerX, centerY] = this.board.findFreeSpot();
@@ -141,12 +139,22 @@ class Game {
         const nextNumber = this.gameConfig.symbolGenerator.next();
         this.targets.add(new Circle(this.board.getContext(), centerX, centerY, String(nextNumber), this.gameConfig.symbolGenerator.getColor()));
     }
+    resetAutoAddNumberTimer() {
+        if (this.gameConfig.autoAddNumberInterval) {
+            this._autoAddNumberTimer();
+            this._autoAddNumberTimer = timers.setInterval(() => {
+                this.addNumber();
+                this.board.draw();
+            }, this.gameConfig.autoAddNumberInterval * 1000);
+        }
+    }
     onClick(target) {
         this.stats.click();
         if (this.gameConfig.hideAfterFirstClick) {
             this.board.setNumberVisibility(false, 0);
         }
         if (!target) {
+            // Click missed the targets
             if (this.gameConfig.addNumberOnMisclick) {
                 this.addNumber();
                 this.board.draw();
@@ -155,6 +163,7 @@ class Game {
         }
         const targetIsCurrent = this.targets.tapTarget(target);
         if (targetIsCurrent) {
+            // Click hit correct target
             this.stats.foundNumber(target.text);
             if (this.targets.allTargetsReached()) {
                 this.stats.finish();
@@ -162,12 +171,21 @@ class Game {
                 timers.clearAll();
                 ui.setScreen('finishGame');
             }
+            else if (this.gameConfig.addNumberOnTargetHit) {
+                this.addNumber();
+            }
             this.board.draw();
         }
         else {
+            // Click hit wrong target
+            this.resetAutoAddNumberTimer();
             if (this.gameConfig.addNumberOnMisclick) {
                 this.addNumber();
                 this.board.draw();
+            }
+            if (this.gameConfig.showNumbersOnMisclick) {
+                this.board.setNumberVisibility(true, 0);
+                this.board.setNumberVisibility(false, this.gameConfig.showNumbersOnMisclick);
             }
         }
     }
@@ -193,10 +211,10 @@ function getPredefinedGame(type, difficulty) {
         clearTheBoard: {
             easy: {
                 amount: 5,
-                addNumberOnMisclick: false,
                 autoAddNumberInterval: 5,
                 hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
+                enableShowButton: true,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
@@ -205,6 +223,7 @@ function getPredefinedGame(type, difficulty) {
                 autoAddNumberInterval: 4,
                 hideNumbersAfter: 4,
                 hideAfterFirstClick: true,
+                enableShowButton: true,
                 symbolGenerator: new NumericAsc(),
             },
             hard: {
@@ -213,14 +232,13 @@ function getPredefinedGame(type, difficulty) {
                 autoAddNumberInterval: 3,
                 hideNumbersAfter: 5,
                 hideAfterFirstClick: true,
+                enableShowButton: true,
                 symbolGenerator: new MixAsc(),
             },
         },
         memory: {
             easy: {
                 amount: 5,
-                addNumberOnMisclick: false,
-                autoAddNumberInterval: 0,
                 hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
                 symbolGenerator: new NumericAsc(),
@@ -228,8 +246,6 @@ function getPredefinedGame(type, difficulty) {
             middle: {
                 amount: 10,
                 addNumberOnMisclick: false,
-                autoAddNumberInterval: 0,
-                hideNumbersAfter: 0,
                 hideAfterFirstClick: true,
                 symbolGenerator: new NumericAsc(),
             },
@@ -242,20 +258,38 @@ function getPredefinedGame(type, difficulty) {
                 symbolGenerator: new NumericAsc(),
             },
         },
+        invisibleNumbers: {
+            easy: {
+                amount: 3,
+                addNumberOnTargetHit: true,
+                hideNumbersAfter: 3,
+                showNumbersOnMisclick: 2,
+                symbolGenerator: new NumericAsc(),
+            },
+            middle: {
+                amount: 4,
+                addNumberOnTargetHit: true,
+                hideNumbersAfter: 2,
+                showNumbersOnMisclick: 1,
+                symbolGenerator: new NumericAsc(),
+            },
+            hard: {
+                amount: 3,
+                addNumberOnTargetHit: true,
+                hideNumbersAfter: 1,
+                enableShowButton: true,
+                autoAddNumberInterval: 10,
+                symbolGenerator: new NumericAsc(),
+            },
+        },
         speed: {
             easy: {
                 amount: 10,
-                addNumberOnMisclick: false,
-                autoAddNumberInterval: 0,
-                hideNumbersAfter: 0,
                 hideAfterFirstClick: false,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
                 amount: 20,
-                addNumberOnMisclick: false,
-                autoAddNumberInterval: 0,
-                hideNumbersAfter: 0,
                 hideAfterFirstClick: true,
                 symbolGenerator: new NumericDesc(20),
             },
@@ -518,7 +552,7 @@ class Timers {
     setInterval(callback, ms) {
         if (ms === 0) {
             callback();
-            return;
+            return () => { };
         }
         const intervalId = setInterval(callback, ms);
         this._timers.add(intervalId);
