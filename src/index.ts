@@ -119,20 +119,14 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     speed: {
       easy: {
         amount: 10,
-        hideAfterFirstClick: false,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
         amount: 20,
-        hideAfterFirstClick: true,
         symbolGenerator: new NumericDesc(20),
       },
       hard: {
         amount: 20,
-        addNumberOnMisclick: true,
-        autoAddNumberInterval: 5,
-        hideNumbersAfter: 5,
-        hideAfterFirstClick: true,
         symbolGenerator: new MixAsc(),
       },
     },
@@ -144,20 +138,20 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 class Main {
   init() {
     ui.setScreen('newGame')
-    ui.elements.newButton1.addEventListener('click', () =>
-      this.startPredefinedGame(),
-    )
+
     ui.elements.abort.addEventListener('click', () => {
       timers.clearAll()
       ui.setScreen('newGame')
     })
-  }
 
-  startPredefinedGame() {
-    const gameType = ui.elements.gameType.value as GameType
-    const difficulty = ui.elements.difficulty.value as Difficulty
-
-    this.startGame(getPredefinedGame(gameType, difficulty))
+    ui.screens.newGame.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'BUTTON') {
+        const gameType = target.dataset.type as GameType
+        const difficulty = target.dataset.difficulty as Difficulty
+        this.startGame(getPredefinedGame(gameType, difficulty))
+      }
+    })
   }
 
   endGame(stats: Stats) {

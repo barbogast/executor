@@ -13,32 +13,63 @@
     <div class="main-container">
       <div class="new-game-screen screen">
         <h1>Executor</h1>
-        <h3>Play game</h3>
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Type</div>
-          <select class="game-type">
-            <option value="memory">Memory</option>
-            <option value="speed">Speed</option>
-            <option value="clearTheBoard">Clear the board</option>
-            <option value="invisibleNumbers">Invisible numbers</option>
-            <!-- <option>Color memory</option> -->
-          </select>
+
+        <h3>Memory</h3>
+        Memorize the numbers, they will disappear after the first click.
+
+        <div class="button-row">
+          <button data-type="memory" data-difficulty="easy">Easy</button>
+          <button data-type="memory" data-difficulty="middle">Medium</button>
+          <button data-type="memory" data-difficulty="hard">Hard</button>
         </div>
 
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Difficulty</div>
-          <select class="difficulty">
-            <option value="easy">Easy</option>
-            <option value="middle">Middle</option>
-            <option value="hard">Monkey</option>
-          </select>
+        <h3>Speed</h3>
+        Click the numbers as fast as possible
+
+        <div class="button-row">
+          <button data-type="speed" data-difficulty="easy">Easy</button>
+          <button data-type="speed" data-difficulty="middle">Medium</button>
+          <button data-type="speed" data-difficulty="hard">Hard</button>
         </div>
 
-        <br />
-        <button class="new1">Start Game</button>
+        <h3>Clear the board</h3>
+        Clear the board. Using the "Show" button adds a number. Numbers are also
+        added over time.
 
-        <br /><br /><br />
+        <div class="button-row">
+          <button data-type="clearTheBoard" data-difficulty="easy">Easy</button>
+          <button data-type="clearTheBoard" data-difficulty="middle">
+            Medium
+          </button>
+          <button data-type="clearTheBoard" data-difficulty="hard">Hard</button>
+        </div>
 
+        <h3>Invisible</h3>
+        Try to click as many numbers as possible before running out of lives
+
+        <div class="button-row">
+          <button data-type="invisibleNumbers" data-difficulty="easy">
+            Easy
+          </button>
+          <button data-type="invisibleNumbers" data-difficulty="middle">
+            Medium
+          </button>
+          <button data-type="invisibleNumbers" data-difficulty="hard">
+            Hard
+          </button>
+        </div>
+
+        <h3>Custom game</h3>
+        Configure your own game
+
+        <div class="button-row">
+          <button data-type="invisibleNumbers" data-difficulty="easy">
+            Go
+          </button>
+        </div>
+      </div>
+
+      <div class="custom-game-screen screen">
         <h3>Custom game</h3>
         <div class="custom-game-input">
           <div class="custom-game-input-label">Amount of numbers</div>
