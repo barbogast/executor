@@ -1,0 +1,74 @@
+canvas {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  display: block;
+}
+.pointer {
+  cursor: pointer;
+}
+
+html,
+body {
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+}
+
+.main-container {
+  padding: 20px;
+  background-color: black;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  color: white;
+}
+
+.screen {
+  display: none;
+  flex-direction: column;
+  flex: 1;
+}
+
+.canvas-wrapper {
+  flex: 1;
+}
+
+.finish-game-screen {
+  white-space: pre;
+}
+
+.finish-game-code {
+  padding-bottom: 20px;
+  display: block;
+  font-size: 16px;
+}
+
+.in-game-menu {
+  display: flex;
+  flex-direction: row;
+}
+
+.show {
+  display: none;
+}
+
+.custom-game-input {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: 5px;
+}
+
+.custom-game-input-label {
+  flex: 1;
+}
+
+h1 {
+  text-align: center;
+}
+
+button {
+  width: 100%;
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Canvas tutorial</title>
+    <script src="https://unpkg.com/asciichart@1.5.25/asciichart.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body onload="new Main().init()">
+    <div class="main-container">
+      <div class="new-game-screen screen">
+        <h1>Executor</h1>
+        <h3>Play game</h3>
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Type</div>
+          <select class="game-type">
+            <option value="memory">Memory</option>
+            <option value="speed">Speed</option>
+            <option value="clearTheBoard">Clear the board</option>
+            <!-- <option>Color memory</option> -->
+          </select>
+        </div>
+
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Difficulty</div>
+          <select class="difficulty">
+            <option value="easy">Easy (letters)</option>
+            <option value="middle">Middle (letters desc)</option>
+            <option value="hard">Monkey (mix)</option>
+          </select>
+        </div>
+
+        <br />
+        <button class="new1">Start Game</button>
+
+        <br /><br /><br />
+
+        <h3>Custom game</h3>
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Amount of numbers</div>
+          <input type="number" />
+        </div>
+
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Add numbers every</div>
+          <input type="number" placeholder="seconds" />
+        </div>
+
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Hide numbers after</div>
+          <input type="number" placeholder="seconds" />
+        </div>
+
+        <div><input type="checkbox" /> Hide numbers after first click</div>
+        <div><input type="checkbox" /> Add number on misclick</div>
+
+        <br />
+        <button class="new3">Start Game</button>
+        <br /><br /><br />
+
+        <h3>Know Thyself</h3>
+        <button class="new2">Start Test Session</button>
+      </div>
+
+      <div class="game-screen screen">
+        <div class="in-game-menu">
+          <button class="abort">Quit game</button>
+          <button class="show">Show</button>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas class="canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="finish-game-screen screen">
+        Congrats
+        <code class="finish-game-code"></code>
+      </div>
+    </div>
+    <script type="text/javascript" src="./index.js"></script>
+  </body>
+</html>
