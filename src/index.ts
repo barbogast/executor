@@ -109,7 +109,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         amount: 3,
         addNumberOnTargetHit: true,
         hideNumbersAfter: 1,
-        enableShowButton: true,
+        enableShowButton: 2,
         autoAddNumberInterval: 10,
         lives: 2,
         symbolGenerator: new NumericAsc(),
