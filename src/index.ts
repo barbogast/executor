@@ -136,12 +136,17 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 }
 
 class Main {
+  game!: Game
+  targets!: Targets
+  board!: Board
+
   init() {
     ui.setScreen('newGame')
 
     ui.elements.abort.addEventListener('click', () => {
       timers.clearAll()
       ui.setScreen('newGame')
+      this.game.endGame(false)
     })
 
     ui.screens.newGame.addEventListener('click', (e) => {
@@ -152,16 +157,36 @@ class Main {
         this.startGame(getPredefinedGame(gameType, difficulty))
       }
     })
-  }
 
-  endGame(stats: Stats) {
-    ui.elements.finishGameCode.innerHTML = stats.print()
-    timers.clearAll()
-    ui.setScreen('finishGame')
+    ui.elements.canvas.addEventListener('click', (e) => {
+      const circle = this.targets.findTarget(e.offsetX, e.offsetY)
+      this.game.onClick(circle)
+    })
+
+    ui.elements.showButton.addEventListener('click', () =>
+      this.game.onClickShow(),
+    )
+
+    ui.elements.canvas.addEventListener('mousemove', (e) =>
+      this.board.mouseMove(e.offsetX, e.offsetY),
+    )
+
     ui.elements.newGame.addEventListener('click', () => {
       timers.clearAll()
       ui.setScreen('newGame')
     })
+  }
+
+  endGame(stats: Stats, isFinished: boolean) {
+    timers.clearAll()
+    if (isFinished) {
+      this.showResults(stats)
+    }
+  }
+
+  showResults(stats: Stats) {
+    ui.elements.finishGameCode.innerHTML = stats.print()
+    ui.setScreen('finishGame')
   }
 
   startGame(gameConfig: GameConfig) {
@@ -170,12 +195,12 @@ class Main {
     }
     timers.clearAll()
     ui.setScreen('game')
-    const targets = new Targets()
-    const board = new Board(targets)
-    const game = new Game(board, targets, gameConfig, (stats) =>
-      this.endGame(stats),
+    this.targets = new Targets()
+    this.board = new Board(this.targets)
+    this.game = new Game(this.board, this.targets, gameConfig, (s, i) =>
+      this.endGame(s, i),
     )
 
-    game.start()
+    this.game.start()
   }
 }

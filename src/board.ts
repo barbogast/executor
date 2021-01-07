@@ -25,12 +25,6 @@ class Board {
     return this.ctx
   }
 
-  registerOnClickHandler(callback: (circle: Circle | void) => void) {
-    ui.elements.canvas.addEventListener('click', (e) =>
-      callback(this.targets.findTarget(e.offsetX, e.offsetY)),
-    )
-  }
-
   mouseMove(x: number, y: number) {
     if (this.targets.findTarget(x, y)) {
       ui.elements.canvas.classList.add('pointer')
@@ -91,9 +85,5 @@ class Board {
 
     ui.elements.canvas.width = this.sizeX
     ui.elements.canvas.height = this.sizeY
-
-    ui.elements.canvas.addEventListener('mousemove', (e) =>
-      this.mouseMove(e.offsetX, e.offsetY),
-    )
   }
 }

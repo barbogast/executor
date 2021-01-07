@@ -1,4 +1,4 @@
-type OnFinish = (stats: Stats) => void
+type OnFinish = (stats: Stats, isFinished: boolean) => void
 
 class Game {
   targets: Targets
@@ -36,15 +36,8 @@ class Game {
     }
     this.board.draw()
 
-    this.board.registerOnClickHandler((circle) => this.onClick(circle))
-
     const enableShowButton = this.gameConfig.enableShowButton
     if (enableShowButton) {
-      ui.elements.showButton.addEventListener('click', () => {
-        this.addNumber()
-        this.board.setNumberVisibility(true, 0)
-        this.board.setNumberVisibility(false, enableShowButton)
-      })
       ui.show('showButton')
     }
 
@@ -91,9 +84,9 @@ class Game {
     ui.elements.livesValue.innerHTML = String(this.lives)
   }
 
-  finishGame() {
+  endGame(isFinished: boolean) {
     this.stats.finish()
-    this.onFinish(this.stats)
+    this.onFinish(this.stats, isFinished)
   }
 
   onClick(target: Circle | void) {
@@ -113,7 +106,7 @@ class Game {
       this.stats.foundNumber(target.text as string)
 
       if (this.targets.allTargetsReached()) {
-        this.finishGame()
+        this.endGame(true)
       } else if (this.gameConfig.addNumberOnTargetHit) {
         this.addNumber()
       }
@@ -124,7 +117,7 @@ class Game {
 
       if (this.gameConfig.lives) {
         if (this.lives === 0) {
-          this.finishGame()
+          this.endGame(true)
           return
         } else {
           this.lives -= 1
@@ -144,6 +137,14 @@ class Game {
           this.gameConfig.showNumbersOnMisclick,
         )
       }
+    }
+  }
+
+  onClickShow() {
+    if (this.gameConfig.enableShowButton) {
+      this.addNumber()
+      this.board.setNumberVisibility(true, 0)
+      this.board.setNumberVisibility(false, this.gameConfig.enableShowButton)
     }
   }
 }
