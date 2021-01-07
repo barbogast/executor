@@ -3,6 +3,7 @@ class Board {
     constructor(targets) {
         this.targets = targets;
         this.numbersAreHidden = false;
+        this._toggleNumberVisibilityTimer = () => { };
         this.sizeX = 0;
         this.sizeY = 0;
         const ctx = ui.elements.canvas.getContext('2d');
@@ -13,9 +14,6 @@ class Board {
     }
     getContext() {
         return this.ctx;
-    }
-    registerOnClickHandler(callback) {
-        ui.elements.canvas.addEventListener('click', (e) => callback(this.targets.findTarget(e.offsetX, e.offsetY)));
     }
     mouseMove(x, y) {
         if (this.targets.findTarget(x, y)) {
@@ -55,7 +53,8 @@ class Board {
         }
     }
     setNumberVisibility(isVisible, delay) {
-        timers.setTimeout(() => {
+        this._toggleNumberVisibilityTimer();
+        this._toggleNumberVisibilityTimer = timers.setTimeout(() => {
             this.numbersAreHidden = !isVisible;
             this.draw();
         }, delay * 1000);
@@ -65,7 +64,6 @@ class Board {
         this.sizeY = ui.elements.canvasWrapper.clientHeight;
         ui.elements.canvas.width = this.sizeX;
         ui.elements.canvas.height = this.sizeY;
-        ui.elements.canvas.addEventListener('mousemove', (e) => this.mouseMove(e.offsetX, e.offsetY));
     }
 }
 class Circle {
@@ -119,15 +117,10 @@ class Game {
             this.addNumber();
         }
         this.board.draw();
-        this.board.registerOnClickHandler((circle) => this.onClick(circle));
-        if (this.gameConfig.enableShowButton) {
+        const enableShowButton = this.gameConfig.enableShowButton;
+        if (enableShowButton) {
             ui.show('showButton');
         }
-        ui.elements.showButton.addEventListener('click', () => {
-            this.addNumber();
-            this.board.setNumberVisibility(true, 0);
-            this.board.setNumberVisibility(false, 2);
-        });
         if (this.gameConfig.hideNumbersAfter) {
             this.board.setNumberVisibility(false, this.gameConfig.hideNumbersAfter);
         }
@@ -157,9 +150,9 @@ class Game {
     updateLives() {
         ui.elements.livesValue.innerHTML = String(this.lives);
     }
-    finishGame() {
+    endGame(isFinished) {
         this.stats.finish();
-        this.onFinish(this.stats);
+        this.onFinish(this.stats, isFinished);
     }
     onClick(target) {
         if (this.gameConfig.hideAfterFirstClick) {
@@ -175,7 +168,7 @@ class Game {
             // Click hit correct target
             this.stats.foundNumber(target.text);
             if (this.targets.allTargetsReached()) {
-                this.finishGame();
+                this.endGame(true);
             }
             else if (this.gameConfig.addNumberOnTargetHit) {
                 this.addNumber();
@@ -187,7 +180,7 @@ class Game {
             this.resetAutoAddNumberTimer();
             if (this.gameConfig.lives) {
                 if (this.lives === 0) {
-                    this.finishGame();
+                    this.endGame(true);
                     return;
                 }
                 else {
@@ -205,23 +198,14 @@ class Game {
             }
         }
     }
+    onClickShow() {
+        if (this.gameConfig.enableShowButton) {
+            this.addNumber();
+            this.board.setNumberVisibility(true, 0);
+            this.board.setNumberVisibility(false, this.gameConfig.enableShowButton);
+        }
+    }
 }
-const FONTSIZE = 26;
-const RADIUS = 25;
-const DIST = RADIUS + RADIUS * 0.1;
-const COLORS = [
-    // https://coolors.co/a86282-9a75a3-7998af-71afbb-6ac1c8-d3dcad-e9c6af-fab6ad-f6958e-f07270
-    '#A86282',
-    '#9A75A3',
-    '#7998AF',
-    '#71AFBB',
-    '#6AC1C8',
-    '#D3DCAD',
-    '#E9C6AF',
-    '#FAB6AD',
-    '#F6958E',
-    '#F07270',
-];
 function getPredefinedGame(type, difficulty) {
     const predefinedGames = {
         clearTheBoard: {
@@ -230,7 +214,7 @@ function getPredefinedGame(type, difficulty) {
                 autoAddNumberInterval: 5,
                 hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
-                enableShowButton: true,
+                enableShowButton: 3,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
@@ -239,7 +223,7 @@ function getPredefinedGame(type, difficulty) {
                 autoAddNumberInterval: 4,
                 hideNumbersAfter: 4,
                 hideAfterFirstClick: true,
-                enableShowButton: true,
+                enableShowButton: 3,
                 symbolGenerator: new NumericAsc(),
             },
             hard: {
@@ -248,7 +232,7 @@ function getPredefinedGame(type, difficulty) {
                 autoAddNumberInterval: 3,
                 hideNumbersAfter: 5,
                 hideAfterFirstClick: true,
-                enableShowButton: true,
+                enableShowButton: 3,
                 symbolGenerator: new MixAsc(),
             },
         },
@@ -295,7 +279,7 @@ function getPredefinedGame(type, difficulty) {
                 amount: 3,
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 1,
-                enableShowButton: true,
+                enableShowButton: 2,
                 autoAddNumberInterval: 10,
                 lives: 2,
                 symbolGenerator: new NumericAsc(),
@@ -318,12 +302,29 @@ function getPredefinedGame(type, difficulty) {
     };
     return predefinedGames[type][difficulty];
 }
+const FONTSIZE = 26;
+const RADIUS = 25;
+const DIST = RADIUS + RADIUS * 0.1;
+const COLORS = [
+    // https://coolors.co/a86282-9a75a3-7998af-71afbb-6ac1c8-d3dcad-e9c6af-fab6ad-f6958e-f07270
+    '#A86282',
+    '#9A75A3',
+    '#7998AF',
+    '#71AFBB',
+    '#6AC1C8',
+    '#D3DCAD',
+    '#E9C6AF',
+    '#FAB6AD',
+    '#F6958E',
+    '#F07270',
+];
 class Main {
     init() {
         ui.setScreen('newGame');
         ui.elements.abort.addEventListener('click', () => {
             timers.clearAll();
             ui.setScreen('newGame');
+            this.game.endGame(false);
         });
         ui.screens.newGame.addEventListener('click', (e) => {
             const target = e.target;
@@ -333,15 +334,26 @@ class Main {
                 this.startGame(getPredefinedGame(gameType, difficulty));
             }
         });
-    }
-    endGame(stats) {
-        ui.elements.finishGameCode.innerHTML = stats.print();
-        timers.clearAll();
-        ui.setScreen('finishGame');
+        ui.elements.canvas.addEventListener('click', (e) => {
+            const circle = this.targets.findTarget(e.offsetX, e.offsetY);
+            this.game.onClick(circle);
+        });
+        ui.elements.showButton.addEventListener('click', () => this.game.onClickShow());
+        ui.elements.canvas.addEventListener('mousemove', (e) => this.board.mouseMove(e.offsetX, e.offsetY));
         ui.elements.newGame.addEventListener('click', () => {
             timers.clearAll();
             ui.setScreen('newGame');
         });
+    }
+    endGame(stats, isFinished) {
+        timers.clearAll();
+        if (isFinished) {
+            this.showResults(stats);
+        }
+    }
+    showResults(stats) {
+        ui.elements.finishGameCode.innerHTML = stats.print();
+        ui.setScreen('finishGame');
     }
     startGame(gameConfig) {
         if (window.innerWidth < 1000) {
@@ -349,10 +361,10 @@ class Main {
         }
         timers.clearAll();
         ui.setScreen('game');
-        const targets = new Targets();
-        const board = new Board(targets);
-        const game = new Game(board, targets, gameConfig, (stats) => this.endGame(stats));
-        game.start();
+        this.targets = new Targets();
+        this.board = new Board(this.targets);
+        this.game = new Game(this.board, this.targets, gameConfig, (s, i) => this.endGame(s, i));
+        this.game.start();
     }
 }
 function getCurrentTimestamp() {
@@ -559,7 +571,7 @@ class Timers {
     setTimeout(callback, ms) {
         if (ms === 0) {
             callback();
-            return;
+            return () => { };
         }
         const timeoutId = setTimeout(() => {
             callback();
