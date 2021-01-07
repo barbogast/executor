@@ -4,10 +4,12 @@ class Board {
   numbersAreHidden: boolean
   sizeX: number
   sizeY: number
+  _toggleNumberVisibilityTimer: () => void
 
   constructor(targets: Targets) {
     this.targets = targets
     this.numbersAreHidden = false
+    this._toggleNumberVisibilityTimer = () => {}
 
     this.sizeX = 0
     this.sizeY = 0
@@ -21,12 +23,6 @@ class Board {
 
   getContext() {
     return this.ctx
-  }
-
-  registerOnClickHandler(callback: (circle: Circle | void) => void) {
-    ui.elements.canvas.addEventListener('click', (e) =>
-      callback(this.targets.findTarget(e.offsetX, e.offsetY)),
-    )
   }
 
   mouseMove(x: number, y: number) {
@@ -76,7 +72,8 @@ class Board {
   }
 
   setNumberVisibility(isVisible: boolean, delay: number) {
-    timers.setTimeout(() => {
+    this._toggleNumberVisibilityTimer()
+    this._toggleNumberVisibilityTimer = timers.setTimeout(() => {
       this.numbersAreHidden = !isVisible
       this.draw()
     }, delay * 1000)
@@ -88,9 +85,5 @@ class Board {
 
     ui.elements.canvas.width = this.sizeX
     ui.elements.canvas.height = this.sizeY
-
-    ui.elements.canvas.addEventListener('mousemove', (e) =>
-      this.mouseMove(e.offsetX, e.offsetY),
-    )
   }
 }
