@@ -30,7 +30,7 @@ class Main {
       this.game.endGame(false)
     })
 
-    ui.screens.newGame.addEventListener('click', (e) => {
+    ui.elements.startGameContainer.addEventListener('click', (e) => {
       const target = e.target as HTMLElement
       if (target.tagName === 'BUTTON') {
         const gameType = target.dataset.type as GameType

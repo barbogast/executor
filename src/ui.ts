@@ -7,6 +7,7 @@ type Elements = {
   lives: HTMLElement
   livesValue: HTMLElement
   newGame: HTMLElement
+  startGameContainer: HTMLElement
 }
 
 type Screens = {
@@ -38,6 +39,7 @@ class UI {
       lives: getElement('lives') as HTMLElement,
       livesValue: getElement('lives-value') as HTMLElement,
       newGame: getElement('new-game') as HTMLElement,
+      startGameContainer: getElement('start-game-container') as HTMLElement,
     }
 
     this.screens = {
