@@ -101,7 +101,7 @@ class Circle {
 }
 class Game {
     constructor(board, targets, gameConfig, onFinish) {
-        this.stats = new Stats();
+        this.stats = new Stats(gameConfig);
         this.board = board;
         this.targets = targets;
         this.gameConfig = gameConfig;
@@ -151,7 +151,7 @@ class Game {
         ui.elements.livesValue.innerHTML = String(this.lives);
     }
     endGame(isFinished) {
-        this.stats.finish();
+        this.stats.finish(ui.elements.store.checked);
         this.onFinish(this.stats, isFinished);
     }
     onClick(target) {
@@ -210,6 +210,8 @@ function getPredefinedGame(type, difficulty) {
     const predefinedGames = {
         clearTheBoard: {
             easy: {
+                gameType: 'clearTheBoard',
+                difficulty: 'easy',
                 amount: 5,
                 autoAddNumberInterval: 5,
                 hideNumbersAfter: 3,
@@ -218,6 +220,8 @@ function getPredefinedGame(type, difficulty) {
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
+                gameType: 'clearTheBoard',
+                difficulty: 'middle',
                 amount: 10,
                 addNumberOnMisclick: true,
                 autoAddNumberInterval: 4,
@@ -227,6 +231,8 @@ function getPredefinedGame(type, difficulty) {
                 symbolGenerator: new NumericAsc(),
             },
             hard: {
+                gameType: 'clearTheBoard',
+                difficulty: 'hard',
                 amount: 20,
                 addNumberOnMisclick: true,
                 autoAddNumberInterval: 3,
@@ -238,18 +244,24 @@ function getPredefinedGame(type, difficulty) {
         },
         memory: {
             easy: {
+                gameType: 'memory',
+                difficulty: 'easy',
                 amount: 5,
                 hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
+                gameType: 'memory',
+                difficulty: 'middle',
                 amount: 10,
                 addNumberOnMisclick: false,
                 hideAfterFirstClick: true,
                 symbolGenerator: new NumericAsc(),
             },
             hard: {
+                gameType: 'memory',
+                difficulty: 'hard',
                 amount: 10,
                 addNumberOnMisclick: true,
                 autoAddNumberInterval: 5,
@@ -260,6 +272,8 @@ function getPredefinedGame(type, difficulty) {
         },
         invisibleNumbers: {
             easy: {
+                gameType: 'invisibleNumbers',
+                difficulty: 'easy',
                 amount: 3,
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 3,
@@ -268,6 +282,8 @@ function getPredefinedGame(type, difficulty) {
                 lives: 5,
             },
             middle: {
+                gameType: 'invisibleNumbers',
+                difficulty: 'middle',
                 amount: 4,
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 2,
@@ -276,6 +292,8 @@ function getPredefinedGame(type, difficulty) {
                 lives: 3,
             },
             hard: {
+                gameType: 'invisibleNumbers',
+                difficulty: 'hard',
                 amount: 3,
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 1,
@@ -287,14 +305,20 @@ function getPredefinedGame(type, difficulty) {
         },
         speed: {
             easy: {
+                gameType: 'speed',
+                difficulty: 'easy',
                 amount: 10,
                 symbolGenerator: new NumericAsc(),
             },
             middle: {
+                gameType: 'speed',
+                difficulty: 'middle',
                 amount: 20,
                 symbolGenerator: new NumericDesc(20),
             },
             hard: {
+                gameType: 'speed',
+                difficulty: 'hard',
                 amount: 20,
                 symbolGenerator: new MixAsc(),
             },
@@ -326,7 +350,7 @@ class Main {
             ui.setScreen('newGame');
             this.game.endGame(false);
         });
-        ui.screens.newGame.addEventListener('click', (e) => {
+        ui.elements.startGameContainer.addEventListener('click', (e) => {
             const target = e.target;
             if (target.tagName === 'BUTTON') {
                 const gameType = target.dataset.type;
@@ -343,6 +367,20 @@ class Main {
         ui.elements.newGame.addEventListener('click', () => {
             timers.clearAll();
             ui.setScreen('newGame');
+        });
+        ui.elements.clipboard.addEventListener('click', () => {
+            const stats = Stats.statsToCsv();
+            if (!stats) {
+                alert('No stats present');
+                return;
+            }
+            navigator.clipboard
+                .writeText(stats)
+                .then(() => alert('Text copied to clipboard.'))
+                .catch((e) => {
+                console.error(e);
+                alert('Stats could not be copied to clipboard');
+            });
         });
     }
     endGame(stats, isFinished) {
@@ -371,7 +409,7 @@ function getCurrentTimestamp() {
     return new Date().getTime();
 }
 class Stats {
-    constructor() {
+    constructor(gameConfig) {
         const now = getCurrentTimestamp();
         this.start = now;
         this.end = now;
@@ -379,6 +417,25 @@ class Stats {
         this.clicks = 0;
         this.correctClicks = 0;
         this.intervals = [];
+        this.gameConfig = gameConfig;
+    }
+    static statsToCsv() {
+        const columns = ['start', 'end', 'clicks', 'correctClicks'];
+        const s = localStorage.getItem('stats');
+        if (!s) {
+            return '';
+        }
+        const stats = JSON.parse(s);
+        let output = '';
+        for (const [gameType, games] of Object.entries(stats.games)) {
+            for (const game of games) {
+                for (const col of columns) {
+                    output += game.stats[col] + ';';
+                }
+                output += '\n';
+            }
+        }
+        return output.trim();
     }
     click() {
         this.clicks += 1;
@@ -389,14 +446,37 @@ class Stats {
         this.intervals.push({ number, duration: now - this.startCurrent });
         this.startCurrent = now;
     }
-    finish() {
+    store() {
+        const s = localStorage.getItem('stats');
+        const currentStats = s ? JSON.parse(s) : { games: {} };
+        const gameType = this.gameConfig.gameType;
+        if (!currentStats.games[gameType]) {
+            currentStats.games[gameType] = [];
+        }
+        currentStats.games[gameType || 'unkownType'].push({
+            gameConfig: this.gameConfig,
+            stats: {
+                start: this.start,
+                end: this.end,
+                clicks: this.clicks,
+                correctClicks: this.correctClicks,
+            },
+            intervals: this.intervals,
+        });
+        localStorage.setItem('stats', JSON.stringify(currentStats));
+    }
+    finish(store) {
         this.end = getCurrentTimestamp();
+        if (store) {
+            this.store();
+        }
     }
     print() {
         let res = '';
         res += `
-Total duraction: ${(this.end - this.start) / 1000} sec
 Misclicks: ${this.clicks - this.correctClicks}
+Numbers cleared: ${this.correctClicks}
+Total duraction: ${((this.end - this.start) / 1000).toFixed(1)} sec
 
 `;
         for (const int of this.intervals) {
@@ -615,6 +695,9 @@ class UI {
             lives: getElement('lives'),
             livesValue: getElement('lives-value'),
             newGame: getElement('new-game'),
+            store: getElement('store'),
+            clipboard: getElement('clipboard'),
+            startGameContainer: getElement('start-game-container'),
         };
         this.screens = {
             newGame: getElement('new-game-screen'),

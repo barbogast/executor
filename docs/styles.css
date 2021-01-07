@@ -27,6 +27,9 @@ h3 {
   flex: 1;
   display: flex;
   flex-direction: column;
+  max-width: 400px;
+  max-height: 800px;
+  margin: 0 auto;
 }
 
 .screen {
@@ -91,8 +94,4 @@ h3 {
 
 h1 {
   text-align: center;
-}
-
-button {
-  width: 100%;
 }
