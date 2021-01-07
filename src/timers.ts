@@ -13,7 +13,7 @@ class Timers {
   setTimeout(callback: () => void, ms: number) {
     if (ms === 0) {
       callback()
-      return
+      return () => {}
     }
 
     const timeoutId = setTimeout(() => {

@@ -4,10 +4,12 @@ class Board {
   numbersAreHidden: boolean
   sizeX: number
   sizeY: number
+  _toggleNumberVisibilityTimer: () => void
 
   constructor(targets: Targets) {
     this.targets = targets
     this.numbersAreHidden = false
+    this._toggleNumberVisibilityTimer = () => {}
 
     this.sizeX = 0
     this.sizeY = 0
@@ -76,7 +78,8 @@ class Board {
   }
 
   setNumberVisibility(isVisible: boolean, delay: number) {
-    timers.setTimeout(() => {
+    this._toggleNumberVisibilityTimer()
+    this._toggleNumberVisibilityTimer = timers.setTimeout(() => {
       this.numbersAreHidden = !isVisible
       this.draw()
     }, delay * 1000)
