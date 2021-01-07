@@ -30,7 +30,7 @@ class Main {
       this.game.endGame(false)
     })
 
-    ui.screens.newGame.addEventListener('click', (e) => {
+    ui.elements.startGameContainer.addEventListener('click', (e) => {
       const target = e.target as HTMLElement
       if (target.tagName === 'BUTTON') {
         const gameType = target.dataset.type as GameType
@@ -55,6 +55,22 @@ class Main {
     ui.elements.newGame.addEventListener('click', () => {
       timers.clearAll()
       ui.setScreen('newGame')
+    })
+
+    ui.elements.clipboard.addEventListener('click', () => {
+      const stats = Stats.statsToCsv()
+      if (!stats) {
+        alert('No stats present')
+        return
+      }
+
+      navigator.clipboard
+        .writeText(stats)
+        .then(() => alert('Text copied to clipboard.'))
+        .catch((e) => {
+          console.error(e)
+          alert('Stats could not be copied to clipboard')
+        })
     })
   }
 

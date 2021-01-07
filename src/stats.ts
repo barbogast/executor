@@ -9,8 +9,9 @@ class Stats {
   clicks: number
   correctClicks: number
   intervals: { number: string; duration: number }[]
+  gameConfig: GameConfig
 
-  constructor() {
+  constructor(gameConfig: GameConfig) {
     const now = getCurrentTimestamp()
     this.start = now
     this.end = now
@@ -18,6 +19,28 @@ class Stats {
     this.clicks = 0
     this.correctClicks = 0
     this.intervals = []
+    this.gameConfig = gameConfig
+  }
+
+  static statsToCsv() {
+    const columns = ['start', 'end', 'clicks', 'correctClicks']
+    const s = localStorage.getItem('stats')
+    if (!s) {
+      return ''
+    }
+
+    const stats = JSON.parse(s)
+    let output = ''
+    for (const [gameType, games] of Object.entries(stats.games)) {
+      for (const game of games as Array<{ stats: { [key: string]: string } }>) {
+        for (const col of columns) {
+          output += game.stats[col] + ';'
+        }
+        output += '\n'
+      }
+    }
+
+    return output.trim()
   }
 
   click() {
@@ -31,16 +54,41 @@ class Stats {
     this.startCurrent = now
   }
 
-  finish() {
+  store() {
+    const s = localStorage.getItem('stats')
+    const currentStats = s ? JSON.parse(s) : { games: {} }
+    const gameType = this.gameConfig.gameType
+    if (!currentStats.games[gameType]) {
+      currentStats.games[gameType] = []
+    }
+
+    currentStats.games[gameType || 'unkownType'].push({
+      gameConfig: this.gameConfig,
+      stats: {
+        start: this.start,
+        end: this.end,
+        clicks: this.clicks,
+        correctClicks: this.correctClicks,
+      },
+      intervals: this.intervals,
+    })
+    localStorage.setItem('stats', JSON.stringify(currentStats))
+  }
+
+  finish(store: boolean) {
     this.end = getCurrentTimestamp()
+    if (store) {
+      this.store()
+    }
   }
 
   print() {
     let res = ''
 
     res += `
-Total duraction: ${(this!.end - this.start) / 1000} sec
 Misclicks: ${this.clicks - this.correctClicks}
+Numbers cleared: ${this.correctClicks}
+Total duraction: ${((this!.end - this.start) / 1000).toFixed(1)} sec
 
 `
 

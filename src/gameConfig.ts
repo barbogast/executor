@@ -1,4 +1,6 @@
 type GameConfig = {
+  gameType: GameType
+  difficulty: Difficulty
   symbolGenerator: SymbolGenerator
   amount: number
   addNumberOnMisclick?: boolean
@@ -20,6 +22,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
   } = {
     clearTheBoard: {
       easy: {
+        gameType: 'clearTheBoard',
+        difficulty: 'easy',
         amount: 5,
         autoAddNumberInterval: 5,
         hideNumbersAfter: 3,
@@ -28,6 +32,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         symbolGenerator: new NumericAsc(),
       },
       middle: {
+        gameType: 'clearTheBoard',
+        difficulty: 'middle',
         amount: 10,
         addNumberOnMisclick: true,
         autoAddNumberInterval: 4,
@@ -37,6 +43,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         symbolGenerator: new NumericAsc(),
       },
       hard: {
+        gameType: 'clearTheBoard',
+        difficulty: 'hard',
         amount: 20,
         addNumberOnMisclick: true,
         autoAddNumberInterval: 3,
@@ -49,18 +57,24 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 
     memory: {
       easy: {
+        gameType: 'memory',
+        difficulty: 'easy',
         amount: 5,
         hideNumbersAfter: 3,
         hideAfterFirstClick: true,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
+        gameType: 'memory',
+        difficulty: 'middle',
         amount: 10,
         addNumberOnMisclick: false,
         hideAfterFirstClick: true,
         symbolGenerator: new NumericAsc(),
       },
       hard: {
+        gameType: 'memory',
+        difficulty: 'hard',
         amount: 10,
         addNumberOnMisclick: true,
         autoAddNumberInterval: 5,
@@ -72,6 +86,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 
     invisibleNumbers: {
       easy: {
+        gameType: 'invisibleNumbers',
+        difficulty: 'easy',
         amount: 3,
         addNumberOnTargetHit: true,
         hideNumbersAfter: 3,
@@ -80,6 +96,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         lives: 5,
       },
       middle: {
+        gameType: 'invisibleNumbers',
+        difficulty: 'middle',
         amount: 4,
         addNumberOnTargetHit: true,
         hideNumbersAfter: 2,
@@ -88,6 +106,8 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         lives: 3,
       },
       hard: {
+        gameType: 'invisibleNumbers',
+        difficulty: 'hard',
         amount: 3,
         addNumberOnTargetHit: true,
         hideNumbersAfter: 1,
@@ -100,14 +120,20 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
 
     speed: {
       easy: {
+        gameType: 'speed',
+        difficulty: 'easy',
         amount: 10,
         symbolGenerator: new NumericAsc(),
       },
       middle: {
+        gameType: 'speed',
+        difficulty: 'middle',
         amount: 20,
         symbolGenerator: new NumericDesc(20),
       },
       hard: {
+        gameType: 'speed',
+        difficulty: 'hard',
         amount: 20,
         symbolGenerator: new MixAsc(),
       },
