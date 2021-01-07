@@ -7,6 +7,8 @@ type Elements = {
   lives: HTMLElement
   livesValue: HTMLElement
   newGame: HTMLElement
+  store: HTMLInputElement
+  clipboard: HTMLElement
   startGameContainer: HTMLElement
 }
 
@@ -39,6 +41,8 @@ class UI {
       lives: getElement('lives') as HTMLElement,
       livesValue: getElement('lives-value') as HTMLElement,
       newGame: getElement('new-game') as HTMLElement,
+      store: getElement('store') as HTMLInputElement,
+      clipboard: getElement('clipboard') as HTMLElement,
       startGameContainer: getElement('start-game-container') as HTMLElement,
     }
 

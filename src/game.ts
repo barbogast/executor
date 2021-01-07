@@ -15,7 +15,7 @@ class Game {
     gameConfig: GameConfig,
     onFinish: OnFinish,
   ) {
-    this.stats = new Stats()
+    this.stats = new Stats(gameConfig)
     this.board = board
     this.targets = targets
     this.gameConfig = gameConfig
@@ -85,7 +85,7 @@ class Game {
   }
 
   endGame(isFinished: boolean) {
-    this.stats.finish()
+    this.stats.finish(ui.elements.store.checked)
     this.onFinish(this.stats, isFinished)
   }
 

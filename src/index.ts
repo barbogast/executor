@@ -56,6 +56,22 @@ class Main {
       timers.clearAll()
       ui.setScreen('newGame')
     })
+
+    ui.elements.clipboard.addEventListener('click', () => {
+      const stats = Stats.statsToCsv()
+      if (!stats) {
+        alert('No stats present')
+        return
+      }
+
+      navigator.clipboard
+        .writeText(stats)
+        .then(() => alert('Text copied to clipboard.'))
+        .catch((e) => {
+          console.error(e)
+          alert('Stats could not be copied to clipboard')
+        })
+    })
   }
 
   endGame(stats: Stats, isFinished: boolean) {
