@@ -96,6 +96,7 @@ class Game {
 
     if (!target) {
       // Click missed the targets
+      audioFiles.playKnock()
       return
     }
 
@@ -114,6 +115,7 @@ class Game {
     } else {
       // Click hit wrong target
       this.resetAutoAddNumberTimer()
+      audioFiles.playKnock()
 
       if (this.gameConfig.lives) {
         if (this.lives === 0) {

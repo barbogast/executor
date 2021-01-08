@@ -39,7 +39,7 @@ class Main {
       }
     })
 
-    ui.elements.canvas.addEventListener('click', (e) => {
+    ui.elements.canvas.addEventListener('mousedown', (e) => {
       const circle = this.targets.findTarget(e.offsetX, e.offsetY)
       this.game.onClick(circle)
     })
