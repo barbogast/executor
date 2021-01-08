@@ -408,6 +408,18 @@ class Main {
 function getCurrentTimestamp() {
     return new Date().getTime();
 }
+// https://stackoverflow.com/a/45309555
+function median(values) {
+    if (values.length === 0)
+        return 0;
+    values = [...values].sort(function (a, b) {
+        return a - b;
+    });
+    const half = Math.floor(values.length / 2);
+    if (values.length % 2)
+        return values[half];
+    return (values[half - 1] + values[half]) / 2.0;
+}
 class Stats {
     constructor(gameConfig) {
         const now = getCurrentTimestamp();
@@ -420,17 +432,49 @@ class Stats {
         this.gameConfig = gameConfig;
     }
     static statsToCsv() {
-        const columns = ['start', 'end', 'clicks', 'correctClicks'];
+        const columns = [
+            'gameConfig.gameType',
+            'gameConfig.difficulty',
+            'stats.start',
+            'stats.end',
+            'stats.clicks',
+            'stats.correctClicks',
+            'intervals.average',
+            'intervals.median',
+            'intervals.min',
+            'intervals.max',
+        ];
         const s = localStorage.getItem('stats');
         if (!s) {
             return '';
         }
         const stats = JSON.parse(s);
-        let output = '';
+        let output = columns.map((s) => s.split('.')[1]).join(';') + '\n';
         for (const [gameType, games] of Object.entries(stats.games)) {
             for (const game of games) {
                 for (const col of columns) {
-                    output += game.stats[col] + ';';
+                    const [obj, prop] = col.split('.');
+                    let value;
+                    if (obj === 'intervals') {
+                        if (prop === 'average') {
+                            value = (game.intervals.reduce((a, b) => a + b.duration, 0) /
+                                game.intervals.length).toFixed(1);
+                        }
+                        else if (prop === 'max') {
+                            value = Math.max(...game.intervals.map((i) => i.duration));
+                        }
+                        else if (prop === 'min') {
+                            value = Math.min(...game.intervals.map((i) => i.duration));
+                        }
+                        else if (prop === 'median') {
+                            value = median(game.intervals.map((i) => i.duration));
+                        }
+                    }
+                    else {
+                        // @ts-ignore
+                        value = game[obj][prop];
+                    }
+                    output += value + ';';
                 }
                 output += '\n';
             }
@@ -453,7 +497,7 @@ class Stats {
         if (!currentStats.games[gameType]) {
             currentStats.games[gameType] = [];
         }
-        currentStats.games[gameType || 'unkownType'].push({
+        const newEntry = {
             gameConfig: this.gameConfig,
             stats: {
                 start: this.start,
@@ -462,7 +506,8 @@ class Stats {
                 correctClicks: this.correctClicks,
             },
             intervals: this.intervals,
-        });
+        };
+        currentStats.games[gameType || 'unkownType'].push(newEntry);
         localStorage.setItem('stats', JSON.stringify(currentStats));
     }
     finish(store) {
