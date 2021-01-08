@@ -1,4 +1,13 @@
 "use strict";
+class AudioFiles {
+    constructor() {
+        this.knock = new Audio('knock.mp3'); // https://freesound.org/people/deleted_user_877451/sounds/66113/
+    }
+    playKnock() {
+        this.knock.play();
+    }
+}
+const audioFiles = new AudioFiles();
 class Board {
     constructor(targets) {
         this.targets = targets;
@@ -105,6 +114,7 @@ class Game {
         this.board = board;
         this.targets = targets;
         this.gameConfig = gameConfig;
+        this.symbolGenerator = initializeSymbolGenerator(this.gameConfig.symbolGenerator);
         this._autoAddNumberTimer = () => { };
         this.lives = gameConfig.lives || 0;
         this.onFinish = onFinish;
@@ -132,11 +142,11 @@ class Game {
     }
     addNumber() {
         const [centerX, centerY] = this.board.findFreeSpot();
-        if (this.gameConfig.symbolGenerator.isLast()) {
+        if (this.symbolGenerator.isLast()) {
             return;
         }
-        const nextNumber = this.gameConfig.symbolGenerator.next();
-        this.targets.add(new Circle(this.board.getContext(), centerX, centerY, String(nextNumber), this.gameConfig.symbolGenerator.getColor()));
+        const nextNumber = this.symbolGenerator.next();
+        this.targets.add(new Circle(this.board.getContext(), centerX, centerY, String(nextNumber), this.symbolGenerator.getColor()));
     }
     resetAutoAddNumberTimer() {
         if (this.gameConfig.autoAddNumberInterval) {
@@ -160,6 +170,7 @@ class Game {
         }
         if (!target) {
             // Click missed the targets
+            audioFiles.playKnock();
             return;
         }
         this.stats.click();
@@ -178,6 +189,7 @@ class Game {
         else {
             // Click hit wrong target
             this.resetAutoAddNumberTimer();
+            audioFiles.playKnock();
             if (this.gameConfig.lives) {
                 if (this.lives === 0) {
                     this.endGame(true);
@@ -217,7 +229,7 @@ function getPredefinedGame(type, difficulty) {
                 hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
                 enableShowButton: 3,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
             middle: {
                 gameType: 'clearTheBoard',
@@ -228,18 +240,18 @@ function getPredefinedGame(type, difficulty) {
                 hideNumbersAfter: 4,
                 hideAfterFirstClick: true,
                 enableShowButton: 3,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
             hard: {
                 gameType: 'clearTheBoard',
                 difficulty: 'hard',
-                amount: 20,
+                amount: 10,
                 addNumberOnMisclick: true,
                 autoAddNumberInterval: 3,
-                hideNumbersAfter: 5,
+                hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
-                enableShowButton: 3,
-                symbolGenerator: new MixAsc(),
+                enableShowButton: 2,
+                symbolGenerator: { type: 'NumericAsc' },
             },
         },
         memory: {
@@ -247,27 +259,22 @@ function getPredefinedGame(type, difficulty) {
                 gameType: 'memory',
                 difficulty: 'easy',
                 amount: 5,
-                hideNumbersAfter: 3,
                 hideAfterFirstClick: true,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
             middle: {
                 gameType: 'memory',
                 difficulty: 'middle',
-                amount: 10,
-                addNumberOnMisclick: false,
+                amount: 7,
                 hideAfterFirstClick: true,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
             hard: {
                 gameType: 'memory',
                 difficulty: 'hard',
                 amount: 10,
-                addNumberOnMisclick: true,
-                autoAddNumberInterval: 5,
-                hideNumbersAfter: 5,
                 hideAfterFirstClick: true,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
         },
         invisibleNumbers: {
@@ -278,7 +285,7 @@ function getPredefinedGame(type, difficulty) {
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 3,
                 showNumbersOnMisclick: 2,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
                 lives: 5,
             },
             middle: {
@@ -288,7 +295,7 @@ function getPredefinedGame(type, difficulty) {
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 2,
                 showNumbersOnMisclick: 1,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
                 lives: 3,
             },
             hard: {
@@ -300,7 +307,7 @@ function getPredefinedGame(type, difficulty) {
                 enableShowButton: 2,
                 autoAddNumberInterval: 10,
                 lives: 2,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
         },
         speed: {
@@ -308,19 +315,19 @@ function getPredefinedGame(type, difficulty) {
                 gameType: 'speed',
                 difficulty: 'easy',
                 amount: 10,
-                symbolGenerator: new NumericAsc(),
+                symbolGenerator: { type: 'NumericAsc' },
             },
             middle: {
                 gameType: 'speed',
                 difficulty: 'middle',
                 amount: 20,
-                symbolGenerator: new NumericDesc(20),
+                symbolGenerator: { type: 'NumericDesc', start: 20 },
             },
             hard: {
                 gameType: 'speed',
                 difficulty: 'hard',
                 amount: 20,
-                symbolGenerator: new MixAsc(),
+                symbolGenerator: { type: 'MixAsc' },
             },
         },
     };
@@ -358,15 +365,18 @@ class Main {
                 this.startGame(getPredefinedGame(gameType, difficulty));
             }
         });
-        ui.elements.canvas.addEventListener('click', (e) => {
+        ui.elements.canvas.addEventListener('mousedown', (e) => {
             const circle = this.targets.findTarget(e.offsetX, e.offsetY);
             this.game.onClick(circle);
         });
         ui.elements.showButton.addEventListener('click', () => this.game.onClickShow());
         ui.elements.canvas.addEventListener('mousemove', (e) => this.board.mouseMove(e.offsetX, e.offsetY));
-        ui.elements.newGame.addEventListener('click', () => {
+        ui.elements.back.addEventListener('click', () => {
             timers.clearAll();
             ui.setScreen('newGame');
+        });
+        ui.elements.newGame.addEventListener('click', () => {
+            this.startGame(this.game.gameConfig);
         });
         ui.elements.clipboard.addEventListener('click', () => {
             const stats = Stats.statsToCsv();
@@ -564,8 +574,8 @@ class NumericAsc {
     }
 }
 class NumericDesc {
-    constructor(start) {
-        this._current = start + 1;
+    constructor(config) {
+        this._current = config.start + 1;
     }
     isLast() {
         return this._current === 1;
@@ -598,8 +608,8 @@ class AlphaAsc {
     }
 }
 class AlphaDesc {
-    constructor(startLetter) {
-        this._current = startLetter.toLowerCase().charCodeAt(0) - 96;
+    constructor(config) {
+        this._current = config.startLetter.toLowerCase().charCodeAt(0) - 96;
     }
     isLast() {
         return this._current === 0;
@@ -635,6 +645,20 @@ class MixAsc {
     }
     getColor() {
         return COLORS[this._current % 10];
+    }
+}
+function initializeSymbolGenerator(cfg) {
+    switch (cfg.type) {
+        case 'NumericAsc':
+            return new NumericAsc();
+        case 'NumericDesc':
+            return new NumericDesc(cfg);
+        case 'AlphaAsc':
+            return new AlphaAsc();
+        case 'AlphaDesc':
+            return new AlphaDesc(cfg);
+        case 'MixAsc':
+            return new MixAsc();
     }
 }
 class Targets {
@@ -743,6 +767,7 @@ class UI {
             store: getElement('store'),
             clipboard: getElement('clipboard'),
             startGameContainer: getElement('start-game-container'),
+            back: getElement('back'),
         };
         this.screens = {
             newGame: getElement('new-game-screen'),
