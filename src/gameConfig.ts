@@ -45,13 +45,13 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
       hard: {
         gameType: 'clearTheBoard',
         difficulty: 'hard',
-        amount: 20,
+        amount: 10,
         addNumberOnMisclick: true,
         autoAddNumberInterval: 3,
-        hideNumbersAfter: 5,
+        hideNumbersAfter: 3,
         hideAfterFirstClick: true,
-        enableShowButton: 3,
-        symbolGenerator: new MixAsc(),
+        enableShowButton: 2,
+        symbolGenerator: new NumericAsc(),
       },
     },
 
