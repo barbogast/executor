@@ -10,6 +10,7 @@ type Elements = {
   store: HTMLInputElement
   clipboard: HTMLElement
   startGameContainer: HTMLElement
+  back: HTMLElement
 }
 
 type Screens = {
@@ -44,6 +45,7 @@ class UI {
       store: getElement('store') as HTMLInputElement,
       clipboard: getElement('clipboard') as HTMLElement,
       startGameContainer: getElement('start-game-container') as HTMLElement,
+      back: getElement('back') as HTMLElement,
     }
 
     this.screens = {

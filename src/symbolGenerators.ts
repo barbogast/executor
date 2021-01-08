@@ -16,6 +16,7 @@ interface SymbolGenerator {
   getColor(): string
 }
 
+type NumberAscConfig = { type: 'NumericAsc' }
 class NumericAsc implements SymbolGenerator {
   _current: number
   constructor() {
@@ -38,10 +39,11 @@ class NumericAsc implements SymbolGenerator {
   }
 }
 
+type NumericDescConfig = { type: 'NumericDesc'; start: number }
 class NumericDesc implements SymbolGenerator {
   _current: number
-  constructor(start: number) {
-    this._current = start + 1
+  constructor(config: NumericDescConfig) {
+    this._current = config.start + 1
   }
 
   isLast() {
@@ -60,6 +62,7 @@ class NumericDesc implements SymbolGenerator {
   }
 }
 
+type AlphaAscConfig = { type: 'AlphaAsc' }
 class AlphaAsc implements SymbolGenerator {
   _current: number
   constructor() {
@@ -82,10 +85,11 @@ class AlphaAsc implements SymbolGenerator {
   }
 }
 
+type AlphaDescConfig = { type: 'AlphaDesc'; startLetter: string }
 class AlphaDesc implements SymbolGenerator {
   _current: number
-  constructor(startLetter: string) {
-    this._current = startLetter.toLowerCase().charCodeAt(0) - 96
+  constructor(config: AlphaDescConfig) {
+    this._current = config.startLetter.toLowerCase().charCodeAt(0) - 96
   }
 
   isLast() {
@@ -104,6 +108,7 @@ class AlphaDesc implements SymbolGenerator {
   }
 }
 
+type MixAscConfig = { type: 'MixAsc' }
 class MixAsc {
   _series: string[]
   _current: number
@@ -130,5 +135,29 @@ class MixAsc {
 
   getColor() {
     return COLORS[this._current % 10]
+  }
+}
+
+type SymbolGeneratorConfig =
+  | NumberAscConfig
+  | NumericDescConfig
+  | AlphaAscConfig
+  | AlphaDescConfig
+  | MixAscConfig
+
+function initializeSymbolGenerator(
+  cfg: SymbolGeneratorConfig,
+): SymbolGenerator {
+  switch (cfg.type) {
+    case 'NumericAsc':
+      return new NumericAsc()
+    case 'NumericDesc':
+      return new NumericDesc(cfg)
+    case 'AlphaAsc':
+      return new AlphaAsc()
+    case 'AlphaDesc':
+      return new AlphaDesc(cfg)
+    case 'MixAsc':
+      return new MixAsc()
   }
 }

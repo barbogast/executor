@@ -8,6 +8,7 @@ class Game {
   _autoAddNumberTimer: () => void
   onFinish: OnFinish
   lives: number
+  symbolGenerator: SymbolGenerator
 
   constructor(
     board: Board,
@@ -19,6 +20,10 @@ class Game {
     this.board = board
     this.targets = targets
     this.gameConfig = gameConfig
+    this.symbolGenerator = initializeSymbolGenerator(
+      this.gameConfig.symbolGenerator,
+    )
+
     this._autoAddNumberTimer = () => {}
     this.lives = gameConfig.lives || 0
     this.onFinish = onFinish
@@ -55,17 +60,17 @@ class Game {
 
   addNumber() {
     const [centerX, centerY] = this.board.findFreeSpot()
-    if (this.gameConfig.symbolGenerator.isLast()) {
+    if (this.symbolGenerator.isLast()) {
       return
     }
-    const nextNumber = this.gameConfig.symbolGenerator.next()
+    const nextNumber = this.symbolGenerator.next()
     this.targets.add(
       new Circle(
         this.board.getContext(),
         centerX,
         centerY,
         String(nextNumber),
-        this.gameConfig.symbolGenerator.getColor(),
+        this.symbolGenerator.getColor(),
       ),
     )
   }
@@ -96,6 +101,7 @@ class Game {
 
     if (!target) {
       // Click missed the targets
+      audioFiles.playKnock()
       return
     }
 
@@ -114,6 +120,7 @@ class Game {
     } else {
       // Click hit wrong target
       this.resetAutoAddNumberTimer()
+      audioFiles.playKnock()
 
       if (this.gameConfig.lives) {
         if (this.lives === 0) {
