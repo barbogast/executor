@@ -52,9 +52,13 @@ class Main {
       this.board.mouseMove(e.offsetX, e.offsetY),
     )
 
-    ui.elements.newGame.addEventListener('click', () => {
+    ui.elements.back.addEventListener('click', () => {
       timers.clearAll()
       ui.setScreen('newGame')
+    })
+
+    ui.elements.newGame.addEventListener('click', () => {
+      this.startGame(this.game.gameConfig)
     })
 
     ui.elements.clipboard.addEventListener('click', () => {
