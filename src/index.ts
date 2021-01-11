@@ -61,21 +61,9 @@ class Main {
       this.startGame(this.game.gameConfig)
     })
 
-    ui.elements.clipboard.addEventListener('click', () => {
-      const stats = Stats.statsToCsv()
-      if (!stats) {
-        alert('No stats present')
-        return
-      }
-
-      navigator.clipboard
-        .writeText(stats)
-        .then(() => alert('Text copied to clipboard.'))
-        .catch((e) => {
-          console.error(e)
-          alert('Stats could not be copied to clipboard')
-        })
-    })
+    ui.elements.clipboard.addEventListener('click', () =>
+      this.copyToClipboard(),
+    )
   }
 
   endGame(stats: Stats, isFinished: boolean) {
@@ -103,5 +91,21 @@ class Main {
     )
 
     this.game.start()
+  }
+
+  copyToClipboard() {
+    const stats = Stats.statsToCsv()
+    if (!stats) {
+      alert('No stats present')
+      return
+    }
+
+    navigator.clipboard
+      .writeText(stats)
+      .then(() => alert('Text copied to clipboard.'))
+      .catch((e) => {
+        console.error(e)
+        alert('Stats could not be copied to clipboard')
+      })
   }
 }
