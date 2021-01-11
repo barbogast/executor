@@ -30,7 +30,33 @@ class Main {
       this.game.endGame(false)
     })
 
+    var sound = new Howl({
+      src: ['knock.mp3'],
+    })
+
+    let audioCtx, audioElement, track, audioBuffer
+    const AudioContext = window.AudioContext || window.webkitAudioContext
+
     ui.elements.startGameContainer.addEventListener('click', (e) => {
+      audioCtx = new AudioContext()
+
+      window
+        .fetch('knock.mp3')
+        .then((response) => response.arrayBuffer())
+        .then((arrayBuffer) => audioCtx.decodeAudioData(arrayBuffer))
+        .then((buffer) => {
+          // playButton.disabled = false;
+          audioBuffer = buffer
+        })
+
+      // load some sound
+      audioElement = document.querySelector('audio')
+      track = audioCtx.createMediaElementSource(audioElement)
+
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume()
+      }
+
       const target = e.target as HTMLElement
       if (target.tagName === 'BUTTON') {
         const gameType = target.dataset.type as GameType
@@ -39,8 +65,73 @@ class Main {
       }
     })
 
+    let x
+
+    ui.elements.canvas.addEventListener('pointerdown', (e) => {
+      if (x) {
+        console.log('pointerdown', getCurrentTimestamp() - x)
+      } else {
+        console.log('pointerdown', 0)
+      }
+      x = getCurrentTimestamp()
+    })
+
+    ui.elements.canvas.addEventListener('touchstart', (e) => {
+      // audioFiles.playKnock()
+      // console.log('play')
+
+      // audioElement.play()
+
+      // const source = audioCtx.createBufferSource()
+      // source.buffer = audioBuffer
+      // source.connect(audioCtx.destination)
+      // source.start()
+
+      sound.play()
+      setTimeout(() => {
+        sound.play()
+      }, 1000)
+
+      if (x) {
+        console.log('touchstart', getCurrentTimestamp() - x)
+      } else {
+        console.log('touchstart', 0)
+      }
+      x = getCurrentTimestamp()
+    })
+
     ui.elements.canvas.addEventListener('mousedown', (e) => {
-      const circle = this.targets.findTarget(e.offsetX, e.offsetY)
+      console.log('XXX', audioElement)
+      // if (audioCtx.state === 'suspended') {
+      //   audioCtx.resume()
+      // }
+      // audioElement.play()
+
+      // const source = audioCtx.createBufferSource()
+      // source.buffer = audioBuffer
+      // source.connect(audioCtx.destination)
+      // source.start()
+
+      if (x) {
+        console.log('mousedown', getCurrentTimestamp() - x)
+      } else {
+        console.log('mousedown', 0)
+      }
+      x = getCurrentTimestamp()
+    })
+
+    ui.elements.canvas.addEventListener('click', (e) => {
+      if (x) {
+        console.log('click', getCurrentTimestamp() - x)
+      } else {
+        console.log('click', 0)
+      }
+      x = getCurrentTimestamp()
+    })
+
+    ui.elements.canvas.addEventListener('touchstart', (e) => {
+      const touch = e.changedTouches[0]
+      const circle = this.targets.findTarget(touch.pageX, touch.pageY)
       this.game.onClick(circle)
     })
 

@@ -95,14 +95,14 @@ class Game {
   }
 
   onClick(target: Circle | void) {
-    if (this.gameConfig.hideAfterFirstClick) {
-      this.board.setNumberVisibility(false, 0)
-    }
-
     if (!target) {
       // Click missed the targets
-      audioFiles.playKnock()
+      // audioFiles.playKnock()
       return
+    }
+
+    if (this.gameConfig.hideAfterFirstClick) {
+      this.board.setNumberVisibility(false, 0)
     }
 
     this.stats.click()
