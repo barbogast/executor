@@ -13,66 +13,84 @@
     <div class="main-container">
       <div class="new-game-screen screen">
         <h1>Executor</h1>
-        <label><input type="checkbox" class="store" />Record statistics</label>
-        <button class="clipboard">Copy stats to clipboard</button>
 
         <div class="start-game-container">
-          <h3>Memory</h3>
-          Memorize the numbers, they will disappear after the first click.
+          <section>
+            <h3>Memory</h3>
+            Memorize the numbers, they will disappear after the first click.
 
-          <div class="button-row">
-            <button data-type="memory" data-difficulty="easy">Easy</button>
-            <button data-type="memory" data-difficulty="medium">Medium</button>
-            <button data-type="memory" data-difficulty="hard">Hard</button>
-          </div>
+            <div class="button-row">
+              <button data-type="memory" data-difficulty="easy">Easy</button>
+              <button data-type="memory" data-difficulty="medium">
+                Medium
+              </button>
+              <button data-type="memory" data-difficulty="hard">Hard</button>
+            </div>
+          </section>
 
-          <h3>Speed</h3>
-          Click the numbers as fast as possible
+          <section>
+            <h3>Speed</h3>
+            Click the numbers as fast as possible
 
-          <div class="button-row">
-            <button data-type="speed" data-difficulty="easy">Easy</button>
-            <button data-type="speed" data-difficulty="medium">Medium</button>
-            <button data-type="speed" data-difficulty="hard">Hard</button>
-          </div>
+            <div class="button-row">
+              <button data-type="speed" data-difficulty="easy">Easy</button>
+              <button data-type="speed" data-difficulty="medium">Medium</button>
+              <button data-type="speed" data-difficulty="hard">Hard</button>
+            </div>
+          </section>
 
-          <h3>Clear the board</h3>
-          Clear the board. Using the "Show" button adds a number. Numbers are
-          also added over time.
+          <section>
+            <h3>Clear the board</h3>
+            Clear the board. Using the "Show" button adds a number. Numbers are
+            also added over time.
 
-          <div class="button-row">
-            <button data-type="clearTheBoard" data-difficulty="easy">
-              Easy
-            </button>
-            <button data-type="clearTheBoard" data-difficulty="medium">
-              Medium
-            </button>
-            <button data-type="clearTheBoard" data-difficulty="hard">
-              Hard
-            </button>
-          </div>
+            <div class="button-row">
+              <button data-type="clearTheBoard" data-difficulty="easy">
+                Easy
+              </button>
+              <button data-type="clearTheBoard" data-difficulty="medium">
+                Medium
+              </button>
+              <button data-type="clearTheBoard" data-difficulty="hard">
+                Hard
+              </button>
+            </div>
+          </section>
 
-          <h3>Invisible</h3>
-          Try to click as many numbers as possible before running out of lives
+          <section>
+            <h3>Invisible</h3>
+            Try to click as many numbers as possible before running out of lives
 
-          <div class="button-row">
-            <button data-type="invisibleNumbers" data-difficulty="easy">
-              Easy
-            </button>
-            <button data-type="invisibleNumbers" data-difficulty="medium">
-              Medium
-            </button>
-            <button data-type="invisibleNumbers" data-difficulty="hard">
-              Hard
-            </button>
-          </div>
-        </div>
+            <div class="button-row">
+              <button data-type="invisibleNumbers" data-difficulty="easy">
+                Easy
+              </button>
+              <button data-type="invisibleNumbers" data-difficulty="medium">
+                Medium
+              </button>
+              <button data-type="invisibleNumbers" data-difficulty="hard">
+                Hard
+              </button>
+            </div>
+          </section>
 
-        <div>
-          <h3>Create your own game</h3>
+          <section>
+            <h3>Create your own game</h3>
 
-          <div class="button-row">
-            <button class="custom-game">Go</button>
-          </div>
+            <div class="button-row">
+              <button class="custom-game">Go</button>
+            </div>
+          </section>
+
+          <section>
+            <h3>Tracking</h3>
+            <div class="cols-2">
+              <label
+                ><input type="checkbox" class="store" />Record statistics</label
+              >
+              <button class="clipboard">Copy stats to clipboard</button>
+            </div>
+          </section>
         </div>
       </div>
 
