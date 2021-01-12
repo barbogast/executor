@@ -98,8 +98,10 @@
         <div class="button-row">
           <button class="custom-game-screen-back">Back</button>
         </div>
-        <h3>Create your own game</h3>
-        <div class="custom-game-input">
+        <br />
+        <br />
+
+        <label class="custom-game-input">
           <div class="custom-game-input-label">Load existing config</div>
           <select class="load-existing-config">
             <option></option>
@@ -140,12 +142,10 @@
               Invisible: Hard
             </option>
           </select>
-        </div>
+        </label>
+        <h3>Create your own game</h3>
 
-        <br />
-        <br />
-
-        <div class="custom-game-input">
+        <label class="custom-game-input">
           <div class="custom-game-input-label">Symbols</div>
           <select name="symbolGenerator">
             <option value="NumericAsc">Numbers</option>
@@ -154,62 +154,69 @@
             <option value="AlphaDesc">Letters Desc</option>
             <option value="MixAsc">Letters and Numbers</option>
           </select>
-        </div>
+        </label>
 
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Amount of numbers</div>
+        <label class="custom-game-input">
+          <div class="custom-game-input-label">Amount of targets</div>
           <input type="number" name="amount" />
-        </div>
+        </label>
 
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Add numbers every</div>
+        <label class="custom-game-input">
+          <div class="custom-game-input-label">Add target every X seconds</div>
           <input
             type="number"
             placeholder="seconds"
             name="autoAddNumberInterval"
           />
-        </div>
+        </label>
 
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Hide numbers after</div>
+        <label class="custom-game-input">
+          <div class="custom-game-input-label">
+            Hide targets after X seconds
+          </div>
           <input type="number" placeholder="seconds" name="hideNumbersAfter" />
-        </div>
+        </label>
 
-        <div class="custom-game-input">
-          <div class="custom-game-input-label">Show numbers after misclick</div>
+        <label class="custom-game-input">
+          <div class="custom-game-input-label">
+            Show targets after misclick for X seconds
+          </div>
           <input
             type="number"
             placeholder="seconds"
             name="showNumbersOnMisclick"
           />
-        </div>
+        </label>
 
-        <div class="custom-game-input">
+        <label class="custom-game-input">
           <div class="custom-game-input-label">
-            Enable "show" button and show numbers for X seconds
+            Enable "show" button and show labels for X seconds
           </div>
           <input type="number" placeholder="seconds" name="enableShowButton" />
-        </div>
+        </label>
 
-        <div class="custom-game-input">
+        <label class="custom-game-input">
           <div class="custom-game-input-label">
             Amount of lives the game starts with
           </div>
           <input type="number" name="lives" />
-        </div>
+        </label>
 
-        <div>
-          <input type="checkbox" name="hideAfterFirstClick" /> Hide numbers
-          after first click
-        </div>
-        <div>
-          <input type="checkbox" name="addNumberOnMisclick" /> Add number on
-          misclick
-        </div>
-        <div>
-          <input type="checkbox" name="addNumberOnTargetHit" /> Add number on
-          correct click
-        </div>
+        <label class="custom-game-input">
+          Hide labels after first click
+          <input type="checkbox" name="hideAfterFirstClick" />
+        </label>
+
+        <label class="custom-game-input">
+          <div>Add target on misclick</div>
+          <input type="checkbox" name="addNumberOnMisclick" />
+        </label>
+
+        <label class="custom-game-input">
+          Add target on correct click
+          <input type="checkbox" name="addNumberOnTargetHit" />
+        </label>
+
         <br /><br />
         <button class="start-custom-game">Start Game</button>
       </div>
