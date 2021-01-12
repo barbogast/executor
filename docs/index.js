@@ -383,7 +383,7 @@ class Main {
             timers.clearAll();
             ui.setScreen('newGame');
         });
-        ui.elements.startCustomGame.addEventListener('click', () => {
+        ui.elements.customGameScreenBack.addEventListener('click', () => {
             ui.setScreen('newGame');
         });
         ui.elements.newGame.addEventListener('click', () => {
