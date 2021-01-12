@@ -13,6 +13,7 @@ type Elements = {
   back: HTMLElement
   customGame: HTMLElement
   startCustomGame: HTMLElement
+  loadExistingConfig: HTMLSelectElement
 }
 
 type Screens = {
@@ -51,6 +52,9 @@ class UI {
       back: getElement('back') as HTMLElement,
       customGame: getElement('custom-game') as HTMLElement,
       startCustomGame: getElement('start-custom-game') as HTMLElement,
+      loadExistingConfig: getElement(
+        'load-existing-config',
+      ) as HTMLSelectElement,
     }
 
     this.screens = {
@@ -91,6 +95,16 @@ class UI {
     return el.value
   }
 
+  writeInput(className: string, value: string | number | void) {
+    const el = document.getElementsByName(
+      className,
+    )[0] as HTMLInputElement | void
+    if (!el) {
+      throw new Error(`Element with name "${className} not found`)
+    }
+    el.value = String(value !== undefined ? value : '')
+  }
+
   readCheckbox(className: string): boolean {
     const el = document.getElementsByName(
       className,
@@ -99,6 +113,16 @@ class UI {
       throw new Error(`Element with name "${className} not found`)
     }
     return el.checked
+  }
+
+  writeCheckbox(className: string, value: boolean | void) {
+    const el = document.getElementsByName(
+      className,
+    )[0] as HTMLInputElement | void
+    if (!el) {
+      throw new Error(`Element with name "${className} not found`)
+    }
+    el.checked = value || false
   }
 }
 

@@ -72,6 +72,10 @@ class Main {
     ui.elements.startCustomGame.addEventListener('click', () => {
       this.createCustomGame()
     })
+
+    ui.elements.loadExistingConfig.addEventListener('change', (e) => {
+      this.loadExistingConfig(e)
+    })
   }
 
   endGame(stats: Stats, isFinished: boolean) {
@@ -135,5 +139,23 @@ class Main {
       lives: parseInt(ui.readInput('lives')),
     }
     this.startGame(gameConfig)
+  }
+
+  loadExistingConfig(e: Event) {
+    const target = e.target as HTMLSelectElement
+    const option = target.options[target.selectedIndex]
+    const gameType = option.dataset.type as GameType
+    const difficulty = option.dataset.difficulty as Difficulty
+    const config = getPredefinedGame(gameType, difficulty)
+
+    ui.writeInput('amount', config.amount)
+    ui.writeInput('autoAddNumberInterval', config.autoAddNumberInterval)
+    ui.writeInput('hideNumbersAfter', config.hideNumbersAfter)
+    ui.writeInput('showNumbersOnMisclick', config.showNumbersOnMisclick)
+    ui.writeInput('enableShowButton', config.enableShowButton)
+    ui.writeInput('lives', config.lives)
+    ui.writeCheckbox('addNumberOnMisclick', config.addNumberOnMisclick)
+    ui.writeCheckbox('addNumberOnTargetHit', config.addNumberOnTargetHit)
+    ui.writeCheckbox('hideAfterFirstClick', config.hideAfterFirstClick)
   }
 }

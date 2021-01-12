@@ -77,7 +77,53 @@
       </div>
 
       <div class="custom-game-screen screen">
+        <div class="button-row">
+          <button class="back">Back</button>
+        </div>
         <h3>Create your own game</h3>
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Load existing config</div>
+          <select class="load-existing-config">
+            <option></option>
+            <option data-type="memory" data-difficulty="easy">
+              Memory: Easy
+            </option>
+            <option data-type="memory" data-difficulty="middle">
+              Memory: Medium
+            </option>
+            <option data-type="memory" data-difficulty="hard">
+              Memory: Hard
+            </option>
+            <option data-type="speed" data-difficulty="easy">
+              Speed: Easy
+            </option>
+            <option data-type="speed" data-difficulty="middle">
+              Speed: Medium
+            </option>
+            <option data-type="speed" data-difficulty="hard">
+              Speed: Hard
+            </option>
+            <option data-type="clearTheBoard" data-difficulty="easy">
+              Clear the board: Easy
+            </option>
+            <option data-type="clearTheBoard" data-difficulty="middle">
+              Clear the board: Medium
+            </option>
+            <option data-type="clearTheBoard" data-difficulty="hard">
+              Clear the board: Hard
+            </option>
+            <option data-type="invisibleNumbers" data-difficulty="easy">
+              Invisible: Easy
+            </option>
+            <option data-type="invisibleNumbers" data-difficulty="middle">
+              Invisible: Medium
+            </option>
+            <option data-type="invisibleNumbers" data-difficulty="hard">
+              Invisible: Hard
+            </option>
+          </select>
+        </div>
+
         <div class="custom-game-input">
           <div class="custom-game-input-label">Amount of numbers</div>
           <input type="number" name="amount" />
@@ -132,7 +178,7 @@
           <input type="checkbox" name="addNumberOnTargetHit" /> Add number on
           correct click
         </div>
-
+        <br /><br />
         <button class="start-custom-game">Start Game</button>
       </div>
 
