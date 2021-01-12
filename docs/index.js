@@ -114,7 +114,7 @@ class Game {
         this.board = board;
         this.targets = targets;
         this.gameConfig = gameConfig;
-        this.symbolGenerator = initializeSymbolGenerator(this.gameConfig.symbolGenerator);
+        this.symbolGenerator = initializeSymbolGenerator(this.gameConfig.symbolGenerator, this.gameConfig.amount);
         this._autoAddNumberTimer = () => { };
         this.lives = gameConfig.lives || 0;
         this.onFinish = onFinish;
@@ -321,7 +321,7 @@ function getPredefinedGame(type, difficulty) {
                 gameType: 'speed',
                 difficulty: 'medium',
                 amount: 20,
-                symbolGenerator: { type: 'NumericDesc', start: 20 },
+                symbolGenerator: { type: 'NumericDesc' },
             },
             hard: {
                 gameType: 'speed',
@@ -383,6 +383,9 @@ class Main {
             timers.clearAll();
             ui.setScreen('newGame');
         });
+        ui.elements.startCustomGame.addEventListener('click', () => {
+            ui.setScreen('newGame');
+        });
         ui.elements.newGame.addEventListener('click', () => {
             this.startGame(this.game.gameConfig);
         });
@@ -433,12 +436,13 @@ class Main {
         });
     }
     createCustomGame() {
+        const symbolGenerator = {
+            type: ui.readInput('symbolGenerator'),
+        };
         const gameConfig = {
             gameType: 'custom',
             difficulty: 'unknown',
-            symbolGenerator: {
-                type: 'AlphaAsc',
-            },
+            symbolGenerator,
             amount: parseInt(ui.readInput('amount')),
             addNumberOnMisclick: ui.readCheckbox('addNumberOnMisclick'),
             addNumberOnTargetHit: ui.readCheckbox('addNumberOnTargetHit'),
@@ -457,6 +461,7 @@ class Main {
         const gameType = option.dataset.type;
         const difficulty = option.dataset.difficulty;
         const config = getPredefinedGame(gameType, difficulty);
+        ui.writeInput('symbolGenerator', config.symbolGenerator.type);
         ui.writeInput('amount', config.amount);
         ui.writeInput('autoAddNumberInterval', config.autoAddNumberInterval);
         ui.writeInput('hideNumbersAfter', config.hideNumbersAfter);
@@ -627,8 +632,8 @@ class NumericAsc {
     }
 }
 class NumericDesc {
-    constructor(config) {
-        this._current = config.start + 1;
+    constructor(amount) {
+        this._current = amount + 1;
     }
     isLast() {
         return this._current === 1;
@@ -661,8 +666,8 @@ class AlphaAsc {
     }
 }
 class AlphaDesc {
-    constructor(config) {
-        this._current = config.startLetter.toLowerCase().charCodeAt(0) - 96;
+    constructor(amount) {
+        this._current = amount - 1;
     }
     isLast() {
         return this._current === 0;
@@ -700,16 +705,16 @@ class MixAsc {
         return COLORS[this._current % 10];
     }
 }
-function initializeSymbolGenerator(cfg) {
+function initializeSymbolGenerator(cfg, amount) {
     switch (cfg.type) {
         case 'NumericAsc':
             return new NumericAsc();
         case 'NumericDesc':
-            return new NumericDesc(cfg);
+            return new NumericDesc(amount);
         case 'AlphaAsc':
             return new AlphaAsc();
         case 'AlphaDesc':
-            return new AlphaDesc(cfg);
+            return new AlphaDesc(amount);
         case 'MixAsc':
             return new MixAsc();
     }
@@ -831,6 +836,7 @@ class UI {
             customGame: getElementByClass('custom-game'),
             startCustomGame: getElementByClass('start-custom-game'),
             loadExistingConfig: getElementByClass('load-existing-config'),
+            customGameScreenBack: getElementByClass('custom-game-screen-back'),
         };
         this.screens = {
             newGame: getElementByClass('new-game-screen'),
