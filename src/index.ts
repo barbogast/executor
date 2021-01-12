@@ -126,12 +126,14 @@ class Main {
   }
 
   createCustomGame() {
+    const symbolGenerator = {
+      type: ui.readInput('symbolGenerator'),
+    } as SymbolGeneratorConfig
+
     const gameConfig: GameConfig = {
       gameType: 'custom',
       difficulty: 'unknown',
-      symbolGenerator: {
-        type: 'AlphaAsc',
-      },
+      symbolGenerator,
       amount: parseInt(ui.readInput('amount')),
       addNumberOnMisclick: ui.readCheckbox('addNumberOnMisclick'),
       addNumberOnTargetHit: ui.readCheckbox('addNumberOnTargetHit'),
@@ -152,6 +154,7 @@ class Main {
     const difficulty = option.dataset.difficulty as Difficulty
     const config = getPredefinedGame(gameType, difficulty)
 
+    ui.writeInput('symbolGenerator', config.symbolGenerator.type)
     ui.writeInput('amount', config.amount)
     ui.writeInput('autoAddNumberInterval', config.autoAddNumberInterval)
     ui.writeInput('hideNumbersAfter', config.hideNumbersAfter)
