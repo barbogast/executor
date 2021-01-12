@@ -130,7 +130,7 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty): GameConfig {
         gameType: 'speed',
         difficulty: 'medium',
         amount: 20,
-        symbolGenerator: { type: 'NumericDesc', start: 20 },
+        symbolGenerator: { type: 'NumericDesc' },
       },
       hard: {
         gameType: 'speed',

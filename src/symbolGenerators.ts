@@ -39,11 +39,11 @@ class NumericAsc implements SymbolGenerator {
   }
 }
 
-type NumericDescConfig = { type: 'NumericDesc'; start: number }
+type NumericDescConfig = { type: 'NumericDesc' }
 class NumericDesc implements SymbolGenerator {
   _current: number
-  constructor(config: NumericDescConfig) {
-    this._current = config.start + 1
+  constructor(amount: number) {
+    this._current = amount + 1
   }
 
   isLast() {
@@ -85,11 +85,11 @@ class AlphaAsc implements SymbolGenerator {
   }
 }
 
-type AlphaDescConfig = { type: 'AlphaDesc'; startLetter: string }
+type AlphaDescConfig = { type: 'AlphaDesc' }
 class AlphaDesc implements SymbolGenerator {
   _current: number
-  constructor(config: AlphaDescConfig) {
-    this._current = config.startLetter.toLowerCase().charCodeAt(0) - 96
+  constructor(amount: number) {
+    this._current = amount - 1
   }
 
   isLast() {
@@ -147,16 +147,17 @@ type SymbolGeneratorConfig =
 
 function initializeSymbolGenerator(
   cfg: SymbolGeneratorConfig,
+  amount: number,
 ): SymbolGenerator {
   switch (cfg.type) {
     case 'NumericAsc':
       return new NumericAsc()
     case 'NumericDesc':
-      return new NumericDesc(cfg)
+      return new NumericDesc(amount)
     case 'AlphaAsc':
       return new AlphaAsc()
     case 'AlphaDesc':
-      return new AlphaDesc(cfg)
+      return new AlphaDesc(amount)
     case 'MixAsc':
       return new MixAsc()
   }
