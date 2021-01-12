@@ -61,20 +61,20 @@ class Main {
       this.startGame(this.game.gameConfig)
     })
 
-    ui.elements.clipboard.addEventListener('click', () => {
-      const stats = Stats.statsToCsv()
-      if (!stats) {
-        alert('No stats present')
-        return
-      }
+    ui.elements.clipboard.addEventListener('click', () =>
+      this.copyToClipboard(),
+    )
 
-      navigator.clipboard
-        .writeText(stats)
-        .then(() => alert('Text copied to clipboard.'))
-        .catch((e) => {
-          console.error(e)
-          alert('Stats could not be copied to clipboard')
-        })
+    ui.elements.customGame.addEventListener('click', () => {
+      ui.setScreen('customGame')
+    })
+
+    ui.elements.startCustomGame.addEventListener('click', () => {
+      this.createCustomGame()
+    })
+
+    ui.elements.loadExistingConfig.addEventListener('change', (e) => {
+      this.loadExistingConfig(e)
     })
   }
 
@@ -103,5 +103,59 @@ class Main {
     )
 
     this.game.start()
+  }
+
+  copyToClipboard() {
+    const stats = Stats.statsToCsv()
+    if (!stats) {
+      alert('No stats present')
+      return
+    }
+
+    navigator.clipboard
+      .writeText(stats)
+      .then(() => alert('Text copied to clipboard.'))
+      .catch((e) => {
+        console.error(e)
+        alert('Stats could not be copied to clipboard')
+      })
+  }
+
+  createCustomGame() {
+    const gameConfig: GameConfig = {
+      gameType: 'custom',
+      difficulty: 'unknown',
+      symbolGenerator: {
+        type: 'AlphaAsc',
+      },
+      amount: parseInt(ui.readInput('amount')),
+      addNumberOnMisclick: ui.readCheckbox('addNumberOnMisclick'),
+      addNumberOnTargetHit: ui.readCheckbox('addNumberOnTargetHit'),
+      autoAddNumberInterval: parseInt(ui.readInput('autoAddNumberInterval')),
+      hideAfterFirstClick: ui.readCheckbox('hideAfterFirstClick'),
+      hideNumbersAfter: parseInt(ui.readInput('hideNumbersAfter')),
+      showNumbersOnMisclick: parseInt(ui.readInput('showNumbersOnMisclick')),
+      enableShowButton: parseInt(ui.readInput('enableShowButton')),
+      lives: parseInt(ui.readInput('lives')),
+    }
+    this.startGame(gameConfig)
+  }
+
+  loadExistingConfig(e: Event) {
+    const target = e.target as HTMLSelectElement
+    const option = target.options[target.selectedIndex]
+    const gameType = option.dataset.type as GameType
+    const difficulty = option.dataset.difficulty as Difficulty
+    const config = getPredefinedGame(gameType, difficulty)
+
+    ui.writeInput('amount', config.amount)
+    ui.writeInput('autoAddNumberInterval', config.autoAddNumberInterval)
+    ui.writeInput('hideNumbersAfter', config.hideNumbersAfter)
+    ui.writeInput('showNumbersOnMisclick', config.showNumbersOnMisclick)
+    ui.writeInput('enableShowButton', config.enableShowButton)
+    ui.writeInput('lives', config.lives)
+    ui.writeCheckbox('addNumberOnMisclick', config.addNumberOnMisclick)
+    ui.writeCheckbox('addNumberOnTargetHit', config.addNumberOnTargetHit)
+    ui.writeCheckbox('hideAfterFirstClick', config.hideAfterFirstClick)
   }
 }

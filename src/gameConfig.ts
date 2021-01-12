@@ -13,12 +13,18 @@ type GameConfig = {
   lives?: number
 }
 
-type GameType = 'clearTheBoard' | 'memory' | 'speed' | 'invisibleNumbers'
-type Difficulty = 'easy' | 'middle' | 'hard'
+type GameType =
+  | 'clearTheBoard'
+  | 'memory'
+  | 'speed'
+  | 'invisibleNumbers'
+  | 'custom'
 
-function getPredefinedGame(type: GameType, difficulty: Difficulty) {
+type Difficulty = 'easy' | 'medium' | 'hard' | 'unknown'
+
+function getPredefinedGame(type: GameType, difficulty: Difficulty): GameConfig {
   const predefinedGames: {
-    [type in GameType]: { [difficulty in Difficulty]: GameConfig }
+    [type in GameType]?: { [difficulty in Difficulty]?: GameConfig }
   } = {
     clearTheBoard: {
       easy: {
@@ -31,9 +37,9 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         enableShowButton: 3,
         symbolGenerator: { type: 'NumericAsc' },
       },
-      middle: {
+      medium: {
         gameType: 'clearTheBoard',
-        difficulty: 'middle',
+        difficulty: 'medium',
         amount: 10,
         addNumberOnMisclick: true,
         autoAddNumberInterval: 4,
@@ -63,9 +69,9 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         hideAfterFirstClick: true,
         symbolGenerator: { type: 'NumericAsc' },
       },
-      middle: {
+      medium: {
         gameType: 'memory',
-        difficulty: 'middle',
+        difficulty: 'medium',
         amount: 7,
         hideAfterFirstClick: true,
         symbolGenerator: { type: 'NumericAsc' },
@@ -90,9 +96,9 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         symbolGenerator: { type: 'NumericAsc' },
         lives: 5,
       },
-      middle: {
+      medium: {
         gameType: 'invisibleNumbers',
-        difficulty: 'middle',
+        difficulty: 'medium',
         amount: 4,
         addNumberOnTargetHit: true,
         hideNumbersAfter: 2,
@@ -120,9 +126,9 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
         amount: 10,
         symbolGenerator: { type: 'NumericAsc' },
       },
-      middle: {
+      medium: {
         gameType: 'speed',
-        difficulty: 'middle',
+        difficulty: 'medium',
         amount: 20,
         symbolGenerator: { type: 'NumericDesc', start: 20 },
       },
@@ -135,5 +141,15 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     },
   }
 
-  return predefinedGames[type][difficulty]
+  const gameTypes = predefinedGames[type]
+  if (!gameTypes) {
+    throw new Error(`Config with gameType "${type}" not found`)
+  }
+
+  const gameConfig = gameTypes[difficulty]
+  if (!gameConfig) {
+    throw new Error(`Config with difficulty "${difficulty}" not found`)
+  }
+
+  return gameConfig
 }
