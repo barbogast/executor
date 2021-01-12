@@ -13,12 +13,18 @@ type GameConfig = {
   lives?: number
 }
 
-type GameType = 'clearTheBoard' | 'memory' | 'speed' | 'invisibleNumbers'
-type Difficulty = 'easy' | 'middle' | 'hard'
+type GameType =
+  | 'clearTheBoard'
+  | 'memory'
+  | 'speed'
+  | 'invisibleNumbers'
+  | 'custom'
+
+type Difficulty = 'easy' | 'middle' | 'hard' | 'unknown'
 
 function getPredefinedGame(type: GameType, difficulty: Difficulty) {
   const predefinedGames: {
-    [type in GameType]: { [difficulty in Difficulty]: GameConfig }
+    [type in GameType]?: { [difficulty in Difficulty]?: GameConfig }
   } = {
     clearTheBoard: {
       easy: {
