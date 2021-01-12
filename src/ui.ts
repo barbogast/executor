@@ -23,12 +23,20 @@ type Screens = {
   customGame: HTMLElement
 }
 
-function getElement(className: string) {
+function getElementByClass(className: string) {
   const el = document.getElementsByClassName(className)[0]
   if (!el) {
     throw new Error(`.${className} not found`)
   }
   return el as HTMLElement
+}
+
+function getElementByName(name: string) {
+  const el = document.getElementsByName(name)[0] as HTMLInputElement | void
+  if (!el) {
+    throw new Error(`Element with name "${name} not found`)
+  }
+  return el
 }
 
 class UI {
@@ -38,30 +46,32 @@ class UI {
 
   constructor() {
     this.elements = {
-      canvasWrapper: getElement('canvas-wrapper'),
-      canvas: getElement('canvas') as HTMLCanvasElement,
-      finishGameCode: getElement('finish-game-code'),
-      showButton: getElement('show'),
-      abort: getElement('abort'),
-      lives: getElement('lives') as HTMLElement,
-      livesValue: getElement('lives-value') as HTMLElement,
-      newGame: getElement('new-game') as HTMLElement,
-      store: getElement('store') as HTMLInputElement,
-      clipboard: getElement('clipboard') as HTMLElement,
-      startGameContainer: getElement('start-game-container') as HTMLElement,
-      back: getElement('back') as HTMLElement,
-      customGame: getElement('custom-game') as HTMLElement,
-      startCustomGame: getElement('start-custom-game') as HTMLElement,
-      loadExistingConfig: getElement(
+      canvasWrapper: getElementByClass('canvas-wrapper'),
+      canvas: getElementByClass('canvas') as HTMLCanvasElement,
+      finishGameCode: getElementByClass('finish-game-code'),
+      showButton: getElementByClass('show'),
+      abort: getElementByClass('abort'),
+      lives: getElementByClass('lives') as HTMLElement,
+      livesValue: getElementByClass('lives-value') as HTMLElement,
+      newGame: getElementByClass('new-game') as HTMLElement,
+      store: getElementByClass('store') as HTMLInputElement,
+      clipboard: getElementByClass('clipboard') as HTMLElement,
+      startGameContainer: getElementByClass(
+        'start-game-container',
+      ) as HTMLElement,
+      back: getElementByClass('back') as HTMLElement,
+      customGame: getElementByClass('custom-game') as HTMLElement,
+      startCustomGame: getElementByClass('start-custom-game') as HTMLElement,
+      loadExistingConfig: getElementByClass(
         'load-existing-config',
       ) as HTMLSelectElement,
     }
 
     this.screens = {
-      newGame: getElement('new-game-screen'),
-      finishGame: getElement('finish-game-screen'),
-      game: getElement('game-screen'),
-      customGame: getElement('custom-game-screen') as HTMLElement,
+      newGame: getElementByClass('new-game-screen'),
+      finishGame: getElementByClass('finish-game-screen'),
+      game: getElementByClass('game-screen'),
+      customGame: getElementByClass('custom-game-screen') as HTMLElement,
     }
 
     this._display = {}
@@ -85,43 +95,23 @@ class UI {
     this.elements[key].style.display = 'none'
   }
 
-  readInput(className: string): string {
-    const el = document.getElementsByName(
-      className,
-    )[0] as HTMLInputElement | void
-    if (!el) {
-      throw new Error(`Element with name "${className} not found`)
-    }
+  readInput(name: string): string {
+    const el = getElementByName(name)
     return el.value
   }
 
-  writeInput(className: string, value: string | number | void) {
-    const el = document.getElementsByName(
-      className,
-    )[0] as HTMLInputElement | void
-    if (!el) {
-      throw new Error(`Element with name "${className} not found`)
-    }
+  writeInput(name: string, value: string | number | void) {
+    const el = getElementByName(name)
     el.value = String(value !== undefined ? value : '')
   }
 
-  readCheckbox(className: string): boolean {
-    const el = document.getElementsByName(
-      className,
-    )[0] as HTMLInputElement | void
-    if (!el) {
-      throw new Error(`Element with name "${className} not found`)
-    }
+  readCheckbox(name: string): boolean {
+    const el = getElementByName(name)
     return el.checked
   }
 
-  writeCheckbox(className: string, value: boolean | void) {
-    const el = document.getElementsByName(
-      className,
-    )[0] as HTMLInputElement | void
-    if (!el) {
-      throw new Error(`Element with name "${className} not found`)
-    }
+  writeCheckbox(name: string, value: boolean | void) {
+    const el = getElementByName(name)
     el.checked = value || false
   }
 }
