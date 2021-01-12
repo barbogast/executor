@@ -143,12 +143,12 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty): GameConfig {
 
   const gameTypes = predefinedGames[type]
   if (!gameTypes) {
-    throw new Error(`Config with gameType "${type}} not found`)
+    throw new Error(`Config with gameType "${type}" not found`)
   }
 
   const gameConfig = gameTypes[difficulty]
   if (!gameConfig) {
-    throw new Error(`Config with difficulty "${difficulty}} not found`)
+    throw new Error(`Config with difficulty "${difficulty}" not found`)
   }
 
   return gameConfig
