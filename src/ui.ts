@@ -14,6 +14,7 @@ type Elements = {
   customGame: HTMLElement
   startCustomGame: HTMLElement
   loadExistingConfig: HTMLSelectElement
+  customGameScreenBack: HTMLElement
 }
 
 type Screens = {
@@ -65,6 +66,7 @@ class UI {
       loadExistingConfig: getElementByClass(
         'load-existing-config',
       ) as HTMLSelectElement,
+      customGameScreenBack: getElementByClass('custom-game-screen-back'),
     }
 
     this.screens = {

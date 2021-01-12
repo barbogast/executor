@@ -22,6 +22,7 @@ class Game {
     this.gameConfig = gameConfig
     this.symbolGenerator = initializeSymbolGenerator(
       this.gameConfig.symbolGenerator,
+      this.gameConfig.amount,
     )
 
     this._autoAddNumberTimer = () => {}
