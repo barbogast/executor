@@ -67,42 +67,73 @@
           </div>
         </div>
 
-        <h3>Custom game</h3>
-        Configure your own game
+        <div>
+          <h3>Create your own game</h3>
 
-        <div class="button-row">
-          <button data-type="invisibleNumbers" data-difficulty="easy">
-            Go
-          </button>
+          <div class="button-row">
+            <button class="custom-game">Go</button>
+          </div>
         </div>
       </div>
 
       <div class="custom-game-screen screen">
-        <h3>Custom game</h3>
+        <h3>Create your own game</h3>
         <div class="custom-game-input">
           <div class="custom-game-input-label">Amount of numbers</div>
-          <input type="number" />
+          <input type="number" name="amount" />
         </div>
 
         <div class="custom-game-input">
           <div class="custom-game-input-label">Add numbers every</div>
-          <input type="number" placeholder="seconds" />
+          <input
+            type="number"
+            placeholder="seconds"
+            name="autoAddNumberInterval"
+          />
         </div>
 
         <div class="custom-game-input">
           <div class="custom-game-input-label">Hide numbers after</div>
-          <input type="number" placeholder="seconds" />
+          <input type="number" placeholder="seconds" name="hideNumbersAfter" />
         </div>
 
-        <div><input type="checkbox" /> Hide numbers after first click</div>
-        <div><input type="checkbox" /> Add number on misclick</div>
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">Show numbers after misclick</div>
+          <input
+            type="number"
+            placeholder="seconds"
+            name="showNumbersOnMisclick"
+          />
+        </div>
 
-        <br />
-        <button class="new3">Start Game</button>
-        <br /><br /><br />
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">
+            Enable "show" button and show numbers for X seconds
+          </div>
+          <input type="number" placeholder="seconds" name="enableShowButton" />
+        </div>
 
-        <h3>Know Thyself</h3>
-        <button class="new2">Start Test Session</button>
+        <div class="custom-game-input">
+          <div class="custom-game-input-label">
+            Amount of lives the game starts with
+          </div>
+          <input type="number" name="lives" />
+        </div>
+
+        <div>
+          <input type="checkbox" name="hideAfterFirstClick" /> Hide numbers
+          after first click
+        </div>
+        <div>
+          <input type="checkbox" name="addNumberOnMisclick" /> Add number on
+          misclick
+        </div>
+        <div>
+          <input type="checkbox" name="addNumberOnTargetHit" /> Add number on
+          correct click
+        </div>
+
+        <button class="start-custom-game">Start Game</button>
       </div>
 
       <div class="game-screen screen">

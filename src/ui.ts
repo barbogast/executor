@@ -11,12 +11,15 @@ type Elements = {
   clipboard: HTMLElement
   startGameContainer: HTMLElement
   back: HTMLElement
+  customGame: HTMLElement
+  startCustomGame: HTMLElement
 }
 
 type Screens = {
   newGame: HTMLElement
   finishGame: HTMLElement
   game: HTMLElement
+  customGame: HTMLElement
 }
 
 function getElement(className: string) {
@@ -46,12 +49,15 @@ class UI {
       clipboard: getElement('clipboard') as HTMLElement,
       startGameContainer: getElement('start-game-container') as HTMLElement,
       back: getElement('back') as HTMLElement,
+      customGame: getElement('custom-game') as HTMLElement,
+      startCustomGame: getElement('start-custom-game') as HTMLElement,
     }
 
     this.screens = {
       newGame: getElement('new-game-screen'),
       finishGame: getElement('finish-game-screen'),
       game: getElement('game-screen'),
+      customGame: getElement('custom-game-screen') as HTMLElement,
     }
 
     this._display = {}
@@ -73,6 +79,26 @@ class UI {
       null,
     ).display
     this.elements[key].style.display = 'none'
+  }
+
+  readInput(className: string): string {
+    const el = document.getElementsByName(
+      className,
+    )[0] as HTMLInputElement | void
+    if (!el) {
+      throw new Error(`Element with name "${className} not found`)
+    }
+    return el.value
+  }
+
+  readCheckbox(className: string): boolean {
+    const el = document.getElementsByName(
+      className,
+    )[0] as HTMLInputElement | void
+    if (!el) {
+      throw new Error(`Element with name "${className} not found`)
+    }
+    return el.checked
   }
 }
 

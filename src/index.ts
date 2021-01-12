@@ -64,6 +64,14 @@ class Main {
     ui.elements.clipboard.addEventListener('click', () =>
       this.copyToClipboard(),
     )
+
+    ui.elements.customGame.addEventListener('click', () => {
+      ui.setScreen('customGame')
+    })
+
+    ui.elements.startCustomGame.addEventListener('click', () => {
+      this.createCustomGame()
+    })
   }
 
   endGame(stats: Stats, isFinished: boolean) {
@@ -107,5 +115,25 @@ class Main {
         console.error(e)
         alert('Stats could not be copied to clipboard')
       })
+  }
+
+  createCustomGame() {
+    const gameConfig: GameConfig = {
+      gameType: 'custom',
+      difficulty: 'unknown',
+      symbolGenerator: {
+        type: 'AlphaAsc',
+      },
+      amount: parseInt(ui.readInput('amount')),
+      addNumberOnMisclick: ui.readCheckbox('addNumberOnMisclick'),
+      addNumberOnTargetHit: ui.readCheckbox('addNumberOnTargetHit'),
+      autoAddNumberInterval: parseInt(ui.readInput('autoAddNumberInterval')),
+      hideAfterFirstClick: ui.readCheckbox('hideAfterFirstClick'),
+      hideNumbersAfter: parseInt(ui.readInput('hideNumbersAfter')),
+      showNumbersOnMisclick: parseInt(ui.readInput('showNumbersOnMisclick')),
+      enableShowButton: parseInt(ui.readInput('enableShowButton')),
+      lives: parseInt(ui.readInput('lives')),
+    }
+    this.startGame(gameConfig)
   }
 }

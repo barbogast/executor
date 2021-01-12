@@ -22,7 +22,7 @@ type GameType =
 
 type Difficulty = 'easy' | 'middle' | 'hard' | 'unknown'
 
-function getPredefinedGame(type: GameType, difficulty: Difficulty) {
+function getPredefinedGame(type: GameType, difficulty: Difficulty): GameConfig {
   const predefinedGames: {
     [type in GameType]?: { [difficulty in Difficulty]?: GameConfig }
   } = {
@@ -141,5 +141,15 @@ function getPredefinedGame(type: GameType, difficulty: Difficulty) {
     },
   }
 
-  return predefinedGames[type][difficulty]
+  const gameTypes = predefinedGames[type]
+  if (!gameTypes) {
+    throw new Error(`Config with gameType "${type}} not found`)
+  }
+
+  const gameConfig = gameTypes[difficulty]
+  if (!gameConfig) {
+    throw new Error(`Config with difficulty "${difficulty}} not found`)
+  }
+
+  return gameConfig
 }
