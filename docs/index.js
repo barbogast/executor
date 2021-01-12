@@ -231,9 +231,9 @@ function getPredefinedGame(type, difficulty) {
                 enableShowButton: 3,
                 symbolGenerator: { type: 'NumericAsc' },
             },
-            middle: {
+            medium: {
                 gameType: 'clearTheBoard',
-                difficulty: 'middle',
+                difficulty: 'medium',
                 amount: 10,
                 addNumberOnMisclick: true,
                 autoAddNumberInterval: 4,
@@ -262,9 +262,9 @@ function getPredefinedGame(type, difficulty) {
                 hideAfterFirstClick: true,
                 symbolGenerator: { type: 'NumericAsc' },
             },
-            middle: {
+            medium: {
                 gameType: 'memory',
-                difficulty: 'middle',
+                difficulty: 'medium',
                 amount: 7,
                 hideAfterFirstClick: true,
                 symbolGenerator: { type: 'NumericAsc' },
@@ -288,9 +288,9 @@ function getPredefinedGame(type, difficulty) {
                 symbolGenerator: { type: 'NumericAsc' },
                 lives: 5,
             },
-            middle: {
+            medium: {
                 gameType: 'invisibleNumbers',
-                difficulty: 'middle',
+                difficulty: 'medium',
                 amount: 4,
                 addNumberOnTargetHit: true,
                 hideNumbersAfter: 2,
@@ -317,9 +317,9 @@ function getPredefinedGame(type, difficulty) {
                 amount: 10,
                 symbolGenerator: { type: 'NumericAsc' },
             },
-            middle: {
+            medium: {
                 gameType: 'speed',
-                difficulty: 'middle',
+                difficulty: 'medium',
                 amount: 20,
                 symbolGenerator: { type: 'NumericDesc', start: 20 },
             },
@@ -331,7 +331,15 @@ function getPredefinedGame(type, difficulty) {
             },
         },
     };
-    return predefinedGames[type][difficulty];
+    const gameTypes = predefinedGames[type];
+    if (!gameTypes) {
+        throw new Error(`Config with gameType "${type}" not found`);
+    }
+    const gameConfig = gameTypes[difficulty];
+    if (!gameConfig) {
+        throw new Error(`Config with difficulty "${difficulty}" not found`);
+    }
+    return gameConfig;
 }
 const FONTSIZE = 26;
 const RADIUS = 25;
@@ -378,19 +386,15 @@ class Main {
         ui.elements.newGame.addEventListener('click', () => {
             this.startGame(this.game.gameConfig);
         });
-        ui.elements.clipboard.addEventListener('click', () => {
-            const stats = Stats.statsToCsv();
-            if (!stats) {
-                alert('No stats present');
-                return;
-            }
-            navigator.clipboard
-                .writeText(stats)
-                .then(() => alert('Text copied to clipboard.'))
-                .catch((e) => {
-                console.error(e);
-                alert('Stats could not be copied to clipboard');
-            });
+        ui.elements.clipboard.addEventListener('click', () => this.copyToClipboard());
+        ui.elements.customGame.addEventListener('click', () => {
+            ui.setScreen('customGame');
+        });
+        ui.elements.startCustomGame.addEventListener('click', () => {
+            this.createCustomGame();
+        });
+        ui.elements.loadExistingConfig.addEventListener('change', (e) => {
+            this.loadExistingConfig(e);
         });
     }
     endGame(stats, isFinished) {
@@ -413,6 +417,55 @@ class Main {
         this.board = new Board(this.targets);
         this.game = new Game(this.board, this.targets, gameConfig, (s, i) => this.endGame(s, i));
         this.game.start();
+    }
+    copyToClipboard() {
+        const stats = Stats.statsToCsv();
+        if (!stats) {
+            alert('No stats present');
+            return;
+        }
+        navigator.clipboard
+            .writeText(stats)
+            .then(() => alert('Text copied to clipboard.'))
+            .catch((e) => {
+            console.error(e);
+            alert('Stats could not be copied to clipboard');
+        });
+    }
+    createCustomGame() {
+        const gameConfig = {
+            gameType: 'custom',
+            difficulty: 'unknown',
+            symbolGenerator: {
+                type: 'AlphaAsc',
+            },
+            amount: parseInt(ui.readInput('amount')),
+            addNumberOnMisclick: ui.readCheckbox('addNumberOnMisclick'),
+            addNumberOnTargetHit: ui.readCheckbox('addNumberOnTargetHit'),
+            autoAddNumberInterval: parseInt(ui.readInput('autoAddNumberInterval')),
+            hideAfterFirstClick: ui.readCheckbox('hideAfterFirstClick'),
+            hideNumbersAfter: parseInt(ui.readInput('hideNumbersAfter')),
+            showNumbersOnMisclick: parseInt(ui.readInput('showNumbersOnMisclick')),
+            enableShowButton: parseInt(ui.readInput('enableShowButton')),
+            lives: parseInt(ui.readInput('lives')),
+        };
+        this.startGame(gameConfig);
+    }
+    loadExistingConfig(e) {
+        const target = e.target;
+        const option = target.options[target.selectedIndex];
+        const gameType = option.dataset.type;
+        const difficulty = option.dataset.difficulty;
+        const config = getPredefinedGame(gameType, difficulty);
+        ui.writeInput('amount', config.amount);
+        ui.writeInput('autoAddNumberInterval', config.autoAddNumberInterval);
+        ui.writeInput('hideNumbersAfter', config.hideNumbersAfter);
+        ui.writeInput('showNumbersOnMisclick', config.showNumbersOnMisclick);
+        ui.writeInput('enableShowButton', config.enableShowButton);
+        ui.writeInput('lives', config.lives);
+        ui.writeCheckbox('addNumberOnMisclick', config.addNumberOnMisclick);
+        ui.writeCheckbox('addNumberOnTargetHit', config.addNumberOnTargetHit);
+        ui.writeCheckbox('hideAfterFirstClick', config.hideAfterFirstClick);
     }
 }
 function getCurrentTimestamp() {
@@ -746,33 +799,44 @@ class Timers {
 }
 // Singleton, no need for separate instances
 const timers = new Timers();
-function getElement(className) {
+function getElementByClass(className) {
     const el = document.getElementsByClassName(className)[0];
     if (!el) {
         throw new Error(`.${className} not found`);
     }
     return el;
 }
+function getElementByName(name) {
+    const el = document.getElementsByName(name)[0];
+    if (!el) {
+        throw new Error(`Element with name "${name} not found`);
+    }
+    return el;
+}
 class UI {
     constructor() {
         this.elements = {
-            canvasWrapper: getElement('canvas-wrapper'),
-            canvas: getElement('canvas'),
-            finishGameCode: getElement('finish-game-code'),
-            showButton: getElement('show'),
-            abort: getElement('abort'),
-            lives: getElement('lives'),
-            livesValue: getElement('lives-value'),
-            newGame: getElement('new-game'),
-            store: getElement('store'),
-            clipboard: getElement('clipboard'),
-            startGameContainer: getElement('start-game-container'),
-            back: getElement('back'),
+            canvasWrapper: getElementByClass('canvas-wrapper'),
+            canvas: getElementByClass('canvas'),
+            finishGameCode: getElementByClass('finish-game-code'),
+            showButton: getElementByClass('show'),
+            abort: getElementByClass('abort'),
+            lives: getElementByClass('lives'),
+            livesValue: getElementByClass('lives-value'),
+            newGame: getElementByClass('new-game'),
+            store: getElementByClass('store'),
+            clipboard: getElementByClass('clipboard'),
+            startGameContainer: getElementByClass('start-game-container'),
+            back: getElementByClass('back'),
+            customGame: getElementByClass('custom-game'),
+            startCustomGame: getElementByClass('start-custom-game'),
+            loadExistingConfig: getElementByClass('load-existing-config'),
         };
         this.screens = {
-            newGame: getElement('new-game-screen'),
-            finishGame: getElement('finish-game-screen'),
-            game: getElement('game-screen'),
+            newGame: getElementByClass('new-game-screen'),
+            finishGame: getElementByClass('finish-game-screen'),
+            game: getElementByClass('game-screen'),
+            customGame: getElementByClass('custom-game-screen'),
         };
         this._display = {};
     }
@@ -787,6 +851,22 @@ class UI {
     hide(key) {
         this._display[key] = window.getComputedStyle(this.elements[key], null).display;
         this.elements[key].style.display = 'none';
+    }
+    readInput(name) {
+        const el = getElementByName(name);
+        return el.value;
+    }
+    writeInput(name, value) {
+        const el = getElementByName(name);
+        el.value = String(value !== undefined ? value : '');
+    }
+    readCheckbox(name) {
+        const el = getElementByName(name);
+        return el.checked;
+    }
+    writeCheckbox(name, value) {
+        const el = getElementByName(name);
+        el.checked = value || false;
     }
 }
 const ui = new UI();
