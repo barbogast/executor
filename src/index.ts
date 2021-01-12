@@ -57,7 +57,7 @@ class Main {
       ui.setScreen('newGame')
     })
 
-    ui.elements.startCustomGame.addEventListener('click', () => {
+    ui.elements.customGameScreenBack.addEventListener('click', () => {
       ui.setScreen('newGame')
     })
 
